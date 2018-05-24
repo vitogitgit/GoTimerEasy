@@ -1,0 +1,3 @@
+rootProject.name = 'GoTimerEasy'
+
+include ':app'
