@@ -14,6 +14,7 @@ export default class Timer extends Component {
     seconds: this.props.initialTime,
   };
 
+
   componentWillReceiveProps(nextProps) {
     const nextTimerStart = nextProps.timerStart;
     if (this.state.seconds > 0) {

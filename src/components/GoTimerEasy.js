@@ -55,57 +55,104 @@ const styles = StyleSheet.create({
 
 export default class GoTimerEasy extends Component {
   state = {
-    timer: 'stop', // eslint-disable-line react/no-unused-state
-    // stop black white
-    gogo: false,
+    currentStatus: 'stop',
+    // stop play pause
+    trunBlack: true,
   };
 
-  renderTouchArea = (block) => {
-    let transformFlip = [];
-    if (block === 'top') {
-      transformFlip = [{ rotate: '180deg' }];
+  runnerColor = (isBlack) => {
+    const { currentStatus, trunBlack } = this.state;
+    if (currentStatus === 'play' && isBlack === trunBlack) {
+      return '#e15f41';
+    }
+    return '#d1ccc070';
+  }
+
+  playStatusTrunMyself = isBlack => (
+    this.state.currentStatus === 'play' && isBlack === this.state.trunBlack
+  )
+
+  playStatusTrunMyselfNot = isBlack => (
+    this.state.currentStatus === 'play' && isBlack !== this.state.trunBlack
+  )
+
+  renderInnerObject = isBlack => (
+    <View style={[styles.touchInnerContainer, { transform: this.transformFlip }]}>
+      <Timer
+        initialTime={50}
+        timerStart={this.playStatusTrunMyself(isBlack)}
+      />
+      <View style={styles.stepContainer}>
+        <Text>0</Text>
+      </View>
+      <View style={styles.countRulesContainer}>
+        <Text>30s[2]</Text>
+      </View>
+      <View style={[
+        styles.markContainer,
+        { backgroundColor: isBlack ? 'black' : null },
+      ]}
+      />
+    </View>
+  )
+
+  renderTouchable = isBlack => (
+    <TouchableHighlight
+      style={[
+        styles.touchAreaContainer,
+        { borderColor: this.runnerColor(isBlack) },
+      ]}
+      onPress={() => {
+        const { currentStatus, trunBlack } = this.state;
+        if (this.playStatusTrunMyselfNot(isBlack)) {
+          return null;
+        }
+        if (currentStatus !== 'play') {
+          this.setState({ currentStatus: 'play' });
+        } else {
+          this.setState({ trunBlack: !trunBlack });
+        }
+        return null;
+      }}
+      underlayColor={this.playStatusTrunMyselfNot(isBlack) ? null : 'rgba(0, 0, 0, 0.05)'}
+    >
+      {this.renderInnerObject(isBlack)}
+    </TouchableHighlight>
+  )
+
+  renderTouchArea = (isBlack) => {
+    this.transformFlip = [];
+    // const { currentStatus, trunBlack } = this.state;
+
+    if (isBlack) {
+      this.transformFlip = [{ rotate: '180deg' }];
     }
 
-    return (
-      <TouchableHighlight
-        style={styles.touchAreaContainer}
-        onPress={() => this.setState({ timer: block === 'top' ? 'white' : 'black' })}
-      >
-        <View style={[styles.touchInnerContainer, { transform: transformFlip }]}>
-          <Timer
-            timerStart={this.state.gogo}
-          />
-          <View style={styles.stepContainer}>
-            <Text>0</Text>
-          </View>
-          <View style={styles.countRulesContainer}>
-            <Text>30s[2]</Text>
-          </View>
-          <View style={[
-            styles.markContainer,
-            { backgroundColor: block === 'top' ? 'black' : null }]}
-          />
-        </View>
-      </TouchableHighlight>
-    );
+    // if (currentStatus === 'play' && trunBlack !== isBlack) {
+    //   return (this.renderView());
+    // }
+    return (this.renderTouchable(isBlack));
   }
 
   render() {
     return (
       <View style={styles.container}>
-        {this.renderTouchArea('top')}
+        {this.renderTouchArea(true)}
         <View style={styles.settingAreaContainer}>
           <TouchableHighlight
             style={{ width: 50, height: 30, backgroundColor: 'red' }}
             onPress={() => {
-              console.log('this.state', this.state);
-              this.setState({ gogo: !this.state.gogo });
+              if (this.state.currentStatus !== 'play') {
+                this.setState({ currentStatus: 'play' });
+              } else {
+                this.setState({ currentStatus: 'pause' });
+              }
             }}
           >
             <View />
           </TouchableHighlight>
         </View>
-        {this.renderTouchArea('bottom')}
+        {this.renderTouchArea(false)}
       </View>
     );
   }
