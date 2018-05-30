@@ -1,6 +1,12 @@
 import React, { Component } from 'react';
 import { View, Text, StyleSheet, TouchableHighlight } from 'react-native';
 import Timer from './Timer';
+import {
+  INITIAL_TIME,
+  RUNNER_BORDER_COLOR,
+  STOPPER_BORDER_COLOR,
+  TOUCH_AREA_UNDERLAY_COLOR,
+} from './Constant';
 
 const styles = StyleSheet.create({
   container: {
@@ -17,7 +23,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0)',
     alignSelf: 'stretch',
     borderWidth: 10,
-    borderColor: '#d1ccc070',
+    borderColor: STOPPER_BORDER_COLOR,
     borderRadius: 1,
   },
   touchInnerContainer: {
@@ -57,14 +63,15 @@ export default class GoTimerEasy extends Component {
   state = {
     timerStart: false,
     trunBlack: true,
+    goSteps: 0,
   };
 
   runnerColor = (isBlack) => {
     const { timerStart, trunBlack } = this.state;
     if (timerStart && isBlack === trunBlack) {
-      return '#e15f41';
+      return RUNNER_BORDER_COLOR;
     }
-    return '#d1ccc070';
+    return STOPPER_BORDER_COLOR;
   }
 
   playStatusTrunMyself = isBlack => (
@@ -78,11 +85,12 @@ export default class GoTimerEasy extends Component {
   renderInnerObject = isBlack => (
     <View style={[styles.touchInnerContainer, { transform: this.transformFlip }]}>
       <Timer
-        initialTime={50}
+        initialTime={INITIAL_TIME}
         timerStart={this.playStatusTrunMyself(isBlack)}
+        onTimeZero={() => console.log('onTimeZero')}
       />
       <View style={styles.stepContainer}>
-        <Text>0</Text>
+        <Text>{this.state.goSteps}</Text>
       </View>
       <View style={styles.countRulesContainer}>
         <Text>30s[2]</Text>
@@ -109,11 +117,14 @@ export default class GoTimerEasy extends Component {
         if (!timerStart) {
           this.setState({ timerStart: true });
         } else {
-          this.setState({ trunBlack: !trunBlack });
+          this.setState({
+            trunBlack: !trunBlack,
+            goSteps: this.state.goSteps += 1,
+          });
         }
         return null;
       }}
-      underlayColor={this.playStatusTrunMyselfNot(isBlack) ? null : 'rgba(0, 0, 0, 0.05)'}
+      underlayColor={this.playStatusTrunMyselfNot(isBlack) ? null : TOUCH_AREA_UNDERLAY_COLOR}
     >
       {this.renderInnerObject(isBlack)}
     </TouchableHighlight>
@@ -146,3 +157,13 @@ export default class GoTimerEasy extends Component {
     );
   }
 }
+
+/*
+
+To:
+  2. 讀秒
+  3. setting
+  4. 外觀
+  5. 聲音
+
+*/

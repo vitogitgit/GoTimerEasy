@@ -33,6 +33,7 @@ export default class Timer extends Component {
   shouldComponentUpdate(nextProps, nextState) {
     if (nextState.seconds === 0) {
       clearInterval(this.timer);
+      this.props.onTimeZero();
     }
     return true;
   }
@@ -57,9 +58,11 @@ export default class Timer extends Component {
 Timer.propTypes = {
   initialTime: PropTypes.number,
   timerStart: PropTypes.bool,
+  onTimeZero: PropTypes.func,
 };
 
 Timer.defaultProps = {
   initialTime: 10,
   timerStart: false,
+  onTimeZero: () => null,
 };
