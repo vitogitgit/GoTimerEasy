@@ -3,6 +3,8 @@ import { View, Text, StyleSheet, TouchableHighlight } from 'react-native';
 import Timer from './Timer';
 import {
   INITIAL_TIME,
+  COUNTDOWN_TIME,
+  NUMBER_OF_COUNTDOWN,
   RUNNER_BORDER_COLOR,
   STOPPER_BORDER_COLOR,
   TOUCH_AREA_UNDERLAY_COLOR,
@@ -86,8 +88,15 @@ export default class GoTimerEasy extends Component {
     <View style={[styles.touchInnerContainer, { transform: this.transformFlip }]}>
       <Timer
         initialTime={INITIAL_TIME}
+        countdownTime={COUNTDOWN_TIME}
+        numberOfCountdown={NUMBER_OF_COUNTDOWN}
+        // 讀秒次數..onTimeZero父元件減一次..子元件也減一次
+        // 讀秒時間..onTimeZero加一次讀秒時間
         timerStart={this.playStatusTrunMyself(isBlack)}
+        onCountdown={() => console.log('onCountdown')}
         onTimeZero={() => console.log('onTimeZero')}
+        onTimeOver={() => console.log('onTimeOver')}
+        // onTimeOver..讀秒用完
       />
       <View style={styles.stepContainer}>
         <Text>{this.state.goSteps}</Text>
