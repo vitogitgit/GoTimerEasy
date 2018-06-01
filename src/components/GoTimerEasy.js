@@ -91,12 +91,10 @@ export default class GoTimerEasy extends Component {
         countdownTime={COUNTDOWN_TIME}
         numberOfCountdown={NUMBER_OF_COUNTDOWN}
         // 讀秒次數..onTimeZero父元件減一次..子元件也減一次
-        // 讀秒時間..onTimeZero加一次讀秒時間
         timerStart={this.playStatusTrunMyself(isBlack)}
-        onCountdown={() => console.log('onCountdown')}
-        onTimeZero={() => console.log('onTimeZero')}
-        onTimeOver={() => console.log('onTimeOver')}
-        // onTimeOver..讀秒用完
+        onCountdown={() => console.log('onCountdown..白方開始讀秒')}
+        onTimeZero={() => console.log('onTimeZero..還有三次讀秒')}
+        onTimeOver={() => console.log('onTimeOver..白方輸了')}
       />
       <View style={styles.stepContainer}>
         <Text>{this.state.goSteps}</Text>

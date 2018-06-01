@@ -1,6 +1,6 @@
 export const INITIAL_TIME = 3;
 // export const INITIAL_TIME = 300;
-export const COUNTDOWN_TIME = 3;
+export const COUNTDOWN_TIME = 6;
 // export const COUNTDOWN_TIME = 10;
 export const NUMBER_OF_COUNTDOWN = 2;
 

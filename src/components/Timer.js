@@ -16,48 +16,64 @@ export default class Timer extends Component {
     numberOfCountdown: this.props.numberOfCountdown,
   };
 
-
   componentWillReceiveProps(nextProps) {
-    const nextTimerStart = nextProps.timerStart;
-    if (this.state.seconds > 0) {
-      if (nextTimerStart && nextTimerStart !== this.props.timerStart) {
-        // if (this.state.isCountdown) {
-        //   this.setState({ seconds: this.props.countdownTime + 1 });
-        // }
-        this.setState({ seconds: this.state.seconds - 1 });
-        this.timer = setInterval(
-          () => this.setState({ seconds: this.state.seconds - 1 }),
-          1000,
-        );
-      } else if (!nextTimerStart) {
-        clearInterval(this.timer);
+    const { seconds, isCountdown, numberOfCountdown } = this.state;
+    const { countdownTime, onCountdown } = this.props;
+
+    if (!nextProps.timerStart) {
+      clearInterval(this.timer);
+      if (!isCountdown && seconds === 0) {
+        onCountdown();
+        this.setState({
+          isCountdown: true,
+          seconds: countdownTime,
+        });
+      } else if (isCountdown && numberOfCountdown > 0) {
+        this.setState({ seconds: countdownTime });
       }
+    } else if (numberOfCountdown > 1) {
+      this.timer = setInterval(this.settingTimer, 1000);
     }
   }
 
-  componentWillUpdate(nextProps, nextState) {
-    if (nextState.seconds === 0 && this.state.seconds) {
-      if (nextState.numberOfCountdown === 0) {
-        clearInterval(this.timer);
-        this.props.onTimeOver();
-      } else if (!nextState.isCountdown) {
-        this.props.onCountdown();
-        this.setState({ // eslint-disable-line react/no-will-update-set-state
-          seconds: this.props.countdownTime,
+  settingTimer = () => {
+    const { seconds, isCountdown, numberOfCountdown } = this.state;
+    const {
+      countdownTime,
+      onTimeZero,
+      onCountdown,
+      onTimeOver,
+    } = this.props;
+
+    if (seconds === 0) {
+      onTimeZero();
+
+      if (!isCountdown) {
+        if (numberOfCountdown === 0) {
+          clearInterval(this.timer);
+          return onTimeOver();
+        }
+        this.setState({
           isCountdown: true,
+          seconds: countdownTime,
         });
-      } else {
-        this.props.onTimeZero();
-        this.setState({ // eslint-disable-line react/no-will-update-set-state
-          seconds: this.props.countdownTime,
-          numberOfCountdown: this.state.numberOfCountdown -= 1,
-        });
+        return onCountdown();
       }
+
+      if (numberOfCountdown === 1) {
+        clearInterval(this.timer);
+        return onTimeOver();
+      }
+
+      return this.setState({
+        numberOfCountdown: numberOfCountdown - 1,
+        seconds: countdownTime,
+      });
     }
+    return this.setState({ seconds: seconds - 1 });
   }
 
   render() {
-    console.log(this.state);
     let minutes = parseInt(this.state.seconds / 60, 10);
     if (minutes < 10) {
       minutes = `0${minutes.toString()}`;
