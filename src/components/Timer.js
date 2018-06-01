@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Text, StyleSheet } from 'react-native';
 import PropTypes from 'prop-types';
+import { TIME_OVER_TEXT } from './Constant';
 
 const styles = StyleSheet.create({
   secondText: {
@@ -14,6 +15,7 @@ export default class Timer extends Component {
     seconds: this.props.initialTime,
     isCountdown: false,
     numberOfCountdown: this.props.numberOfCountdown,
+    isTimeOver: false,
   };
 
   componentWillReceiveProps(nextProps) {
@@ -46,11 +48,10 @@ export default class Timer extends Component {
     } = this.props;
 
     if (seconds === 0) {
-      onTimeZero();
-
       if (!isCountdown) {
         if (numberOfCountdown === 0) {
           clearInterval(this.timer);
+          this.setState({ isTimeOver: true });
           return onTimeOver();
         }
         this.setState({
@@ -62,9 +63,11 @@ export default class Timer extends Component {
 
       if (numberOfCountdown === 1) {
         clearInterval(this.timer);
+        this.setState({ isTimeOver: true });
         return onTimeOver();
       }
 
+      onTimeZero();
       return this.setState({
         numberOfCountdown: numberOfCountdown - 1,
         seconds: countdownTime,
@@ -73,20 +76,31 @@ export default class Timer extends Component {
     return this.setState({ seconds: seconds - 1 });
   }
 
-  render() {
-    let minutes = parseInt(this.state.seconds / 60, 10);
+  renderText = () => {
+    const { seconds, isTimeOver } = this.state;
+    if (isTimeOver) {
+      return (
+        <Text style={styles.secondText}>{TIME_OVER_TEXT}</Text>
+      );
+    }
+
+    let minutes = parseInt(seconds / 60, 10);
     if (minutes < 10) {
       minutes = `0${minutes.toString()}`;
     }
 
-    let seconds = this.state.seconds % 60;
-    if (seconds < 10) {
-      seconds = `0${seconds.toString()}`;
+    let second = seconds % 60;
+    if (second < 10) {
+      second = `0${second.toString()}`;
     }
 
     return (
-      <Text style={styles.secondText}>{`${minutes}:${seconds}`}</Text>
+      <Text style={styles.secondText}>{`${minutes}:${second}`}</Text>
     );
+  }
+
+  render() {
+    return this.renderText();
   }
 }
 
