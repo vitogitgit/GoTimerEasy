@@ -1,6 +1,14 @@
 import React, { Component } from 'react';
 import { View, Text, StyleSheet, TouchableHighlight } from 'react-native';
 import Timer from './Timer';
+import {
+  INITIAL_TIME,
+  COUNTDOWN_TIME,
+  NUMBER_OF_COUNTDOWN,
+  RUNNER_BORDER_COLOR,
+  STOPPER_BORDER_COLOR,
+  TOUCH_AREA_UNDERLAY_COLOR,
+} from './Constant';
 
 const styles = StyleSheet.create({
   container: {
@@ -17,7 +25,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0)',
     alignSelf: 'stretch',
     borderWidth: 10,
-    borderColor: '#d1ccc070',
+    borderColor: STOPPER_BORDER_COLOR,
     borderRadius: 1,
   },
   touchInnerContainer: {
@@ -55,35 +63,41 @@ const styles = StyleSheet.create({
 
 export default class GoTimerEasy extends Component {
   state = {
-    currentStatus: 'stop',
-    // stop play pause
+    timerStart: false,
     trunBlack: true,
+    goSteps: 0,
   };
 
   runnerColor = (isBlack) => {
-    const { currentStatus, trunBlack } = this.state;
-    if (currentStatus === 'play' && isBlack === trunBlack) {
-      return '#e15f41';
+    const { timerStart, trunBlack } = this.state;
+    if (timerStart && isBlack === trunBlack) {
+      return RUNNER_BORDER_COLOR;
     }
-    return '#d1ccc070';
+    return STOPPER_BORDER_COLOR;
   }
 
   playStatusTrunMyself = isBlack => (
-    this.state.currentStatus === 'play' && isBlack === this.state.trunBlack
+    this.state.timerStart && isBlack === this.state.trunBlack
   )
 
   playStatusTrunMyselfNot = isBlack => (
-    this.state.currentStatus === 'play' && isBlack !== this.state.trunBlack
+    this.state.timerStart && isBlack !== this.state.trunBlack
   )
 
   renderInnerObject = isBlack => (
     <View style={[styles.touchInnerContainer, { transform: this.transformFlip }]}>
       <Timer
-        initialTime={50}
+        initialTime={INITIAL_TIME}
+        countdownTime={COUNTDOWN_TIME}
+        numberOfCountdown={NUMBER_OF_COUNTDOWN}
+        // 讀秒次數..onTimeZero父元件減一次..子元件也減一次
         timerStart={this.playStatusTrunMyself(isBlack)}
+        onCountdown={() => console.log('onCountdown..白方開始讀秒')}
+        onTimeZero={() => console.log('onTimeZero..還有三次讀秒')}
+        onTimeOver={() => console.log('onTimeOver..白方輸了')}
       />
       <View style={styles.stepContainer}>
-        <Text>0</Text>
+        <Text>{this.state.goSteps}</Text>
       </View>
       <View style={styles.countRulesContainer}>
         <Text>30s[2]</Text>
@@ -103,18 +117,21 @@ export default class GoTimerEasy extends Component {
         { borderColor: this.runnerColor(isBlack) },
       ]}
       onPress={() => {
-        const { currentStatus, trunBlack } = this.state;
+        const { timerStart, trunBlack } = this.state;
         if (this.playStatusTrunMyselfNot(isBlack)) {
           return null;
         }
-        if (currentStatus !== 'play') {
-          this.setState({ currentStatus: 'play' });
+        if (!timerStart) {
+          this.setState({ timerStart: true });
         } else {
-          this.setState({ trunBlack: !trunBlack });
+          this.setState({
+            trunBlack: !trunBlack,
+            goSteps: this.state.goSteps += 1,
+          });
         }
         return null;
       }}
-      underlayColor={this.playStatusTrunMyselfNot(isBlack) ? null : 'rgba(0, 0, 0, 0.05)'}
+      underlayColor={this.playStatusTrunMyselfNot(isBlack) ? null : TOUCH_AREA_UNDERLAY_COLOR}
     >
       {this.renderInnerObject(isBlack)}
     </TouchableHighlight>
@@ -122,15 +139,11 @@ export default class GoTimerEasy extends Component {
 
   renderTouchArea = (isBlack) => {
     this.transformFlip = [];
-    // const { currentStatus, trunBlack } = this.state;
 
     if (isBlack) {
       this.transformFlip = [{ rotate: '180deg' }];
     }
 
-    // if (currentStatus === 'play' && trunBlack !== isBlack) {
-    //   return (this.renderView());
-    // }
     return (this.renderTouchable(isBlack));
   }
 
@@ -141,13 +154,7 @@ export default class GoTimerEasy extends Component {
         <View style={styles.settingAreaContainer}>
           <TouchableHighlight
             style={{ width: 50, height: 30, backgroundColor: 'red' }}
-            onPress={() => {
-              if (this.state.currentStatus !== 'play') {
-                this.setState({ currentStatus: 'play' });
-              } else {
-                this.setState({ currentStatus: 'pause' });
-              }
-            }}
+            onPress={() => this.setState({ timerStart: !this.state.timerStart })}
           >
             <View />
           </TouchableHighlight>
@@ -157,3 +164,13 @@ export default class GoTimerEasy extends Component {
     );
   }
 }
+
+/*
+
+To:
+  2. 讀秒
+  3. setting
+  4. 外觀
+  5. 聲音
+
+*/
