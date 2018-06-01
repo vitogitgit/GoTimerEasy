@@ -64,9 +64,37 @@ const styles = StyleSheet.create({
 export default class GoTimerEasy extends Component {
   state = {
     timerStart: false,
+    timerPause: false,
     trunBlack: true,
     goSteps: 0,
+    numberOfCountdownForBlack: NUMBER_OF_COUNTDOWN,
+    numberOfCountdownForWhite: NUMBER_OF_COUNTDOWN,
   };
+
+  onCountdown = (isBlack) => {
+    const player = isBlack ? '黑方' : '白方';
+    console.log(`onCountdown..${player}開始讀秒`);
+  }
+
+  onCountdownOver = (isBlack) => {
+    const player = isBlack ? '黑方' : '白方';
+    let { numberOfCountdownForBlack, numberOfCountdownForWhite } = this.state;
+    if (isBlack) {
+      this.setState({ numberOfCountdownForBlack: numberOfCountdownForBlack -= 1 });
+      if (numberOfCountdownForBlack === 0) {
+        console.log(`onTimeOver..${player}輸了`);
+      } else {
+        console.log(`onCountdownOver..${player} ${COUNTDOWN_TIME} 秒 ${numberOfCountdownForBlack} 次`);
+      }
+    } else {
+      this.setState({ numberOfCountdownForWhite: numberOfCountdownForWhite -= 1 });
+      if (numberOfCountdownForWhite === 0) {
+        console.log(`onTimeOver..${player}輸了`);
+      } else {
+        console.log(`onCountdownOver..${player} ${COUNTDOWN_TIME} 秒 ${numberOfCountdownForWhite} 次`);
+      }
+    }
+  }
 
   runnerColor = (isBlack) => {
     const { timerStart, trunBlack } = this.state;
@@ -84,23 +112,32 @@ export default class GoTimerEasy extends Component {
     this.state.timerStart && isBlack !== this.state.trunBlack
   )
 
+  renderNumberOfCountdown = (isBlack) => {
+    const { numberOfCountdownForBlack, numberOfCountdownForWhite } = this.state;
+    if (isBlack) {
+      return numberOfCountdownForBlack;
+    }
+    return numberOfCountdownForWhite;
+  }
+
   renderInnerObject = isBlack => (
     <View style={[styles.touchInnerContainer, { transform: this.transformFlip }]}>
       <Timer
         initialTime={INITIAL_TIME}
         countdownTime={COUNTDOWN_TIME}
         numberOfCountdown={NUMBER_OF_COUNTDOWN}
-        // 讀秒次數..onTimeZero父元件減一次..子元件也減一次
         timerStart={this.playStatusTrunMyself(isBlack)}
-        onCountdown={() => console.log('onCountdown..白方開始讀秒')}
-        onTimeZero={() => console.log('onTimeZero..還有三次讀秒')}
-        onTimeOver={() => console.log('onTimeOver..白方輸了')}
+        timerPause={this.state.timerPause}
+        // onTimeZero={() => console.log('onTimeZero..')}
+        onCountdown={() => this.onCountdown(isBlack)}
+        onCountdownOver={() => this.onCountdownOver(isBlack)}
+        onTimeOver={() => this.onCountdownOver(isBlack)}
       />
       <View style={styles.stepContainer}>
         <Text>{this.state.goSteps}</Text>
       </View>
       <View style={styles.countRulesContainer}>
-        <Text>30s[2]</Text>
+        <Text>{COUNTDOWN_TIME}s[{this.renderNumberOfCountdown(isBlack)}]</Text>
       </View>
       <View style={[
         styles.markContainer,
@@ -154,7 +191,10 @@ export default class GoTimerEasy extends Component {
         <View style={styles.settingAreaContainer}>
           <TouchableHighlight
             style={{ width: 50, height: 30, backgroundColor: 'red' }}
-            onPress={() => this.setState({ timerStart: !this.state.timerStart })}
+            onPress={() => this.setState({
+              timerStart: !this.state.timerStart,
+              timerPause: !this.state.timerPause,
+            })}
           >
             <View />
           </TouchableHighlight>
@@ -168,9 +208,10 @@ export default class GoTimerEasy extends Component {
 /*
 
 To:
-  2. 讀秒
   3. setting
   4. 外觀
   5. 聲音
+
+bug:
 
 */
