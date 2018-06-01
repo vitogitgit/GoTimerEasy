@@ -55,7 +55,11 @@ export default class Timer extends Component {
   }
 
   settingTimer = () => {
-    const { seconds, isCountdown, numberOfCountdown } = this.state;
+    const {
+      seconds,
+      isCountdown,
+      numberOfCountdown,
+    } = this.state;
     const {
       countdownTime,
       onCountdown,
