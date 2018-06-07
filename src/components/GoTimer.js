@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, TouchableHighlight } from 'react-native';
+import { View, Text, Image, StyleSheet, TouchableHighlight } from 'react-native';
 import Timer from './Timer';
 import {
   INITIAL_TIME,
@@ -8,6 +8,10 @@ import {
   RUNNER_BORDER_COLOR,
   STOPPER_BORDER_COLOR,
   TOUCH_AREA_UNDERLAY_COLOR,
+  SETTING_ICON,
+  PLAY_ICON,
+  PAUSE_ICON,
+  RESET_ICON,
 } from './Constant';
 
 const styles = StyleSheet.create({
@@ -35,9 +39,9 @@ const styles = StyleSheet.create({
   },
   settingAreaContainer: {
     flex: 0.2,
-    backgroundColor: 'yellow',
+    flexDirection: 'row',
     alignSelf: 'stretch',
-    justifyContent: 'center',
+    justifyContent: 'space-evenly',
     alignItems: 'center',
   },
   stepContainer: {
@@ -58,6 +62,10 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'black',
     borderRadius: 15,
+  },
+  icon: {
+    width: 40,
+    height: 40,
   },
 });
 
@@ -159,7 +167,10 @@ export default class GoTimerEasy extends Component {
           return null;
         }
         if (!timerStart) {
-          this.setState({ timerStart: true });
+          this.setState({
+            timerStart: true,
+            timerPause: false,
+          });
         } else {
           this.setState({
             trunBlack: !trunBlack,
@@ -190,13 +201,40 @@ export default class GoTimerEasy extends Component {
         {this.renderTouchArea(true)}
         <View style={styles.settingAreaContainer}>
           <TouchableHighlight
-            style={{ width: 50, height: 30, backgroundColor: 'red' }}
+            underlayColor={null}
+            onPress={() => {
+              this.setState({
+                timerStart: false,
+                timerPause: true,
+              });
+              this.props.navigation.navigate('Setting'); // eslint-disable-line react/prop-types
+            }}
+          >
+            <Image
+              style={styles.icon}
+              source={SETTING_ICON}
+            />
+          </TouchableHighlight>
+          <TouchableHighlight
+            underlayColor={null}
+            onPress={() => null}
+          >
+            <Image
+              style={styles.icon}
+              source={RESET_ICON}
+            />
+          </TouchableHighlight>
+          <TouchableHighlight
+            underlayColor={null}
             onPress={() => this.setState({
               timerStart: !this.state.timerStart,
-              timerPause: !this.state.timerPause,
+              timerPause: this.state.timerStart,
             })}
           >
-            <View />
+            <Image
+              style={styles.icon}
+              source={this.state.timerStart ? PAUSE_ICON : PLAY_ICON}
+            />
           </TouchableHighlight>
         </View>
         {this.renderTouchArea(false)}

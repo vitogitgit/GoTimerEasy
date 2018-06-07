@@ -8,4 +8,10 @@ export const RUNNER_BORDER_COLOR = '#e15f41';
 export const STOPPER_BORDER_COLOR = '#d1ccc070';
 export const TOUCH_AREA_UNDERLAY_COLOR = 'rgba(0, 0, 0, 0.05)';
 
-export const TIME_OVER_IMAGE = require('../image/pig.png'); // eslint-disable-line global-require
+/* eslint-disable global-require */
+
+export const TIME_OVER_ICON = require('../image/pig.png');
+export const PLAY_ICON = require('../image/play.png');
+export const PAUSE_ICON = require('../image/pause.png');
+export const SETTING_ICON = require('../image/setting.png');
+export const RESET_ICON = require('../image/reset.png');

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Text, Image, StyleSheet } from 'react-native';
 import PropTypes from 'prop-types';
-import { TIME_OVER_IMAGE } from './Constant';
+import { TIME_OVER_ICON } from './Constant';
 
 const styles = StyleSheet.create({
   secondText: {
@@ -105,7 +105,7 @@ export default class Timer extends Component {
       return (
         <Image
           style={styles.timeOverImage}
-          source={TIME_OVER_IMAGE}
+          source={TIME_OVER_ICON}
         />
       );
     }
