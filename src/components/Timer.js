@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Text, Image, StyleSheet } from 'react-native';
 import PropTypes from 'prop-types';
-import { TIME_OVER_ICON } from './Constant';
+import { TIME_OVER_ICON } from '../Constant';
 
 const styles = StyleSheet.create({
   secondText: {
@@ -15,12 +15,15 @@ const styles = StyleSheet.create({
 });
 
 export default class Timer extends Component {
-  state = {
-    seconds: this.props.initialTime,
-    isCountdown: false,
-    numberOfCountdown: this.props.numberOfCountdown,
-    isTimeOver: false,
-  };
+  constructor(props) {
+    super(props);
+    this.state = {
+      seconds: this.props.initialTime,
+      isCountdown: false,
+      numberOfCountdown: this.props.numberOfCountdown,
+      isTimeOver: false,
+    };
+  }
 
   componentWillReceiveProps(nextProps) {
     const {
@@ -97,6 +100,18 @@ export default class Timer extends Component {
       return onCountdownOver();
     }
     return this.setState({ seconds: seconds - 1 });
+  }
+
+  resetTimer = () => {
+    clearInterval(this.timer);
+    setTimeout(() => {
+      this.setState({
+        seconds: this.props.initialTime,
+        isCountdown: false,
+        numberOfCountdown: this.props.numberOfCountdown,
+        isTimeOver: false,
+      });
+    }, 3);
   }
 
   renderText = () => {
