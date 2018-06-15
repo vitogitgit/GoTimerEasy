@@ -1,26 +1,47 @@
 import React, { Component } from 'react';
-import { Text, StyleSheet } from 'react-native';
+import { View, Text, Image, StyleSheet } from 'react-native';
 import PropTypes from 'prop-types';
-import { TIME_OVER_TEXT } from './Constant';
+import * as Constant from '../Constant';
+import VideoPlayer from './VideoPlayer';
 
 const styles = StyleSheet.create({
   secondText: {
-    fontSize: 106,
+    fontSize: 90,
     fontWeight: '300',
+  },
+  timeOverImage: {
+    width: 140,
+    height: 128,
   },
 });
 
 export default class Timer extends Component {
-  state = {
-    seconds: this.props.initialTime,
-    isCountdown: false,
-    numberOfCountdown: this.props.numberOfCountdown,
-    isTimeOver: false,
-  };
+  constructor(props) {
+    super(props);
+    this.state = {
+      seconds: this.props.initialTime,
+      isCountdown: false,
+      numberOfCountdown: this.props.numberOfCountdown,
+      isTimeOver: false,
+    };
+    this.countdownVideo = React.createRef();
+  }
 
   componentWillReceiveProps(nextProps) {
-    const { seconds, isCountdown, numberOfCountdown } = this.state;
-    const { countdownTime, onCountdown } = this.props;
+    const {
+      seconds,
+      isCountdown,
+      numberOfCountdown,
+      isTimeOver,
+    } = this.state;
+    const {
+      countdownTime,
+      onCountdown,
+    } = this.props;
+
+    if (isTimeOver) {
+      return;
+    }
 
     if (!nextProps.timerStart) {
       clearInterval(this.timer);
@@ -30,20 +51,28 @@ export default class Timer extends Component {
           isCountdown: true,
           seconds: countdownTime,
         });
-      } else if (isCountdown && numberOfCountdown > 0) {
+      } else if (isCountdown && numberOfCountdown > 0 && !nextProps.timerPause) {
         this.setState({ seconds: countdownTime });
       }
-    } else if (numberOfCountdown > 1) {
+    } else if (numberOfCountdown > 0) {
       this.timer = setInterval(this.settingTimer, 1000);
     }
   }
 
+  componentDidUpdate(prevProps, prevState) {
+    this.playVideoByCountdown(prevState);
+  }
+
   settingTimer = () => {
-    const { seconds, isCountdown, numberOfCountdown } = this.state;
+    const {
+      seconds,
+      isCountdown,
+      numberOfCountdown,
+    } = this.state;
     const {
       countdownTime,
-      onTimeZero,
       onCountdown,
+      onCountdownOver,
       onTimeOver,
     } = this.props;
 
@@ -67,20 +96,72 @@ export default class Timer extends Component {
         return onTimeOver();
       }
 
-      onTimeZero();
-      return this.setState({
+      clearInterval(this.timer);
+      this.setState({
         numberOfCountdown: numberOfCountdown - 1,
         seconds: countdownTime,
       });
+      return onCountdownOver();
     }
     return this.setState({ seconds: seconds - 1 });
+  }
+
+  playVideoByCountdown = (prevState) => {
+    const { isCountdown, seconds } = this.state;
+    if (!isCountdown || prevState.seconds === seconds || seconds > 8) { return; }
+
+    let src;
+    switch (seconds) {
+      case 1:
+        src = Constant.SOUND_NUMBER_1;
+        break;
+      case 2:
+        src = Constant.SOUND_NUMBER_2;
+        break;
+      case 3:
+        src = Constant.SOUND_NUMBER_3;
+        break;
+      case 4:
+        src = Constant.SOUND_NUMBER_4;
+        break;
+      case 5:
+        src = Constant.SOUND_NUMBER_5;
+        break;
+      case 6:
+        src = Constant.SOUND_NUMBER_6;
+        break;
+      case 7:
+        src = Constant.SOUND_NUMBER_7;
+        break;
+      case 8:
+        src = Constant.SOUND_NUMBER_8;
+        break;
+      default:
+        return;
+    }
+    this.countdownVideo.current.play(src);
+  }
+
+  resetTimer = () => {
+    clearInterval(this.timer);
+    setTimeout(() => {
+      this.setState({
+        seconds: this.props.initialTime,
+        isCountdown: false,
+        numberOfCountdown: this.props.numberOfCountdown,
+        isTimeOver: false,
+      });
+    }, 3);
   }
 
   renderText = () => {
     const { seconds, isTimeOver } = this.state;
     if (isTimeOver) {
       return (
-        <Text style={styles.secondText}>{TIME_OVER_TEXT}</Text>
+        <Image
+          style={styles.timeOverImage}
+          source={Constant.TIME_OVER_ICON}
+        />
       );
     }
 
@@ -95,7 +176,10 @@ export default class Timer extends Component {
     }
 
     return (
-      <Text style={styles.secondText}>{`${minutes}:${second}`}</Text>
+      <View>
+        <Text style={styles.secondText}>{`${minutes}:${second}`}</Text>
+        <VideoPlayer ref={this.countdownVideo} />
+      </View>
     );
   }
 
@@ -109,8 +193,9 @@ Timer.propTypes = {
   countdownTime: PropTypes.number,
   numberOfCountdown: PropTypes.number,
   timerStart: PropTypes.bool,
+  timerPause: PropTypes.bool,
   onCountdown: PropTypes.func,
-  onTimeZero: PropTypes.func,
+  onCountdownOver: PropTypes.func,
   onTimeOver: PropTypes.func,
 };
 
@@ -119,7 +204,8 @@ Timer.defaultProps = {
   countdownTime: 3,
   numberOfCountdown: 1,
   timerStart: false,
+  timerPause: false,
   onCountdown: () => null,
-  onTimeZero: () => null,
+  onCountdownOver: () => null,
   onTimeOver: () => null,
 };
