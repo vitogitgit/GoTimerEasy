@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
-import { Text, Image, StyleSheet } from 'react-native';
+import { View, Text, Image, StyleSheet } from 'react-native';
 import PropTypes from 'prop-types';
-import { TIME_OVER_ICON } from '../Constant';
+import * as Constant from '../Constant';
+import VideoPlayer from './VideoPlayer';
 
 const styles = StyleSheet.create({
   secondText: {
@@ -23,6 +24,7 @@ export default class Timer extends Component {
       numberOfCountdown: this.props.numberOfCountdown,
       isTimeOver: false,
     };
+    this.countdownVideo = React.createRef();
   }
 
   componentWillReceiveProps(nextProps) {
@@ -57,6 +59,10 @@ export default class Timer extends Component {
     }
   }
 
+  componentDidUpdate(prevProps, prevState) {
+    this.playVideoByCountdown(prevState);
+  }
+
   settingTimer = () => {
     const {
       seconds,
@@ -66,13 +72,11 @@ export default class Timer extends Component {
     const {
       countdownTime,
       onCountdown,
-      onTimeZero,
       onCountdownOver,
       onTimeOver,
     } = this.props;
 
     if (seconds === 0) {
-      onTimeZero();
       if (!isCountdown) {
         if (numberOfCountdown === 0) {
           clearInterval(this.timer);
@@ -102,6 +106,42 @@ export default class Timer extends Component {
     return this.setState({ seconds: seconds - 1 });
   }
 
+  playVideoByCountdown = (prevState) => {
+    const { isCountdown, seconds } = this.state;
+    if (!isCountdown || prevState.seconds === seconds || seconds > 8) { return; }
+
+    let src;
+    switch (seconds) {
+      case 1:
+        src = Constant.SOUND_NUMBER_1;
+        break;
+      case 2:
+        src = Constant.SOUND_NUMBER_2;
+        break;
+      case 3:
+        src = Constant.SOUND_NUMBER_3;
+        break;
+      case 4:
+        src = Constant.SOUND_NUMBER_4;
+        break;
+      case 5:
+        src = Constant.SOUND_NUMBER_5;
+        break;
+      case 6:
+        src = Constant.SOUND_NUMBER_6;
+        break;
+      case 7:
+        src = Constant.SOUND_NUMBER_7;
+        break;
+      case 8:
+        src = Constant.SOUND_NUMBER_8;
+        break;
+      default:
+        return;
+    }
+    this.countdownVideo.current.play(src);
+  }
+
   resetTimer = () => {
     clearInterval(this.timer);
     setTimeout(() => {
@@ -120,7 +160,7 @@ export default class Timer extends Component {
       return (
         <Image
           style={styles.timeOverImage}
-          source={TIME_OVER_ICON}
+          source={Constant.TIME_OVER_ICON}
         />
       );
     }
@@ -136,7 +176,10 @@ export default class Timer extends Component {
     }
 
     return (
-      <Text style={styles.secondText}>{`${minutes}:${second}`}</Text>
+      <View>
+        <Text style={styles.secondText}>{`${minutes}:${second}`}</Text>
+        <VideoPlayer ref={this.countdownVideo} />
+      </View>
     );
   }
 
@@ -152,7 +195,6 @@ Timer.propTypes = {
   timerStart: PropTypes.bool,
   timerPause: PropTypes.bool,
   onCountdown: PropTypes.func,
-  onTimeZero: PropTypes.func,
   onCountdownOver: PropTypes.func,
   onTimeOver: PropTypes.func,
 };
@@ -164,7 +206,6 @@ Timer.defaultProps = {
   timerStart: false,
   timerPause: false,
   onCountdown: () => null,
-  onTimeZero: () => null,
   onCountdownOver: () => null,
   onTimeOver: () => null,
 };

@@ -1,16 +1,7 @@
 import React, { Component } from 'react';
 import { View, Text, StyleSheet, TouchableHighlight, Picker } from 'react-native';
 import PropTypes from 'prop-types';
-import {
-  SETTING_BUTTON_TEXT,
-  INITIAL_TIME_LIMIT,
-  COUNTDOWN_TIME_LIMIT,
-  NUMBER_OF_COUNTDOWN_LIMIT,
-  INITIAL_TIME_TITLE,
-  INITIAL_TIME_UNIT,
-  COUNTDOWN_TIME_TITLE,
-  NUMBER_OF_COUNTDOWN_TITLE,
-} from '../Constant';
+import * as Constant from '../Constant';
 
 const styles = StyleSheet.create({
   container: {
@@ -52,7 +43,7 @@ const styles = StyleSheet.create({
 
 export default class Setting extends Component {
   static navigationOptions = {
-    title: 'setting',
+    title: 'Settings',
   };
 
   constructor(props) {
@@ -71,7 +62,7 @@ export default class Setting extends Component {
       this.updateInitialTime,
       0,
       300,
-      INITIAL_TIME_LIMIT,
+      Constant.INITIAL_TIME_LIMIT,
       60,
     ],
     countdownTime: [
@@ -79,14 +70,14 @@ export default class Setting extends Component {
       this.updateCountdownTime,
       10,
       5,
-      COUNTDOWN_TIME_LIMIT,
+      Constant.COUNTDOWN_TIME_LIMIT,
     ],
     numberOfCountdown: [
       this.state.numberOfCountdown,
       this.updateNumberOfCountdown,
       1,
       1,
-      NUMBER_OF_COUNTDOWN_LIMIT,
+      Constant.NUMBER_OF_COUNTDOWN_LIMIT,
     ],
   })
 
@@ -104,9 +95,9 @@ export default class Setting extends Component {
 
   renderRules = () => {
     const { initialTime, countdownTime, numberOfCountdown } = this.state;
-    const basicTimeText = `${INITIAL_TIME_TITLE}: ${initialTime / 60}${INITIAL_TIME_UNIT}`;
-    const countdownTimeText = `${COUNTDOWN_TIME_TITLE}: ${countdownTime}`;
-    const numberOfCountdownText = `${NUMBER_OF_COUNTDOWN_TITLE}: ${numberOfCountdown}`;
+    const basicTimeText = `${Constant.INITIAL_TIME_TITLE}: ${initialTime / 60}${Constant.INITIAL_TIME_UNIT}`;
+    const countdownTimeText = `${Constant.COUNTDOWN_TIME_TITLE}: ${countdownTime}`;
+    const numberOfCountdownText = `${Constant.NUMBER_OF_COUNTDOWN_TITLE}: ${numberOfCountdown}`;
     return (
       <View style={styles.rulesContainer}>
         <Text style={styles.rulesText}>{basicTimeText}</Text>
@@ -167,7 +158,7 @@ export default class Setting extends Component {
           navigation.state.params.resetGoTimer();
         }}
       >
-        <Text style={styles.buttonText}>{SETTING_BUTTON_TEXT}</Text>
+        <Text style={styles.buttonText}>{Constant.SETTING_BUTTON_TEXT}</Text>
       </TouchableHighlight>
     );
   }

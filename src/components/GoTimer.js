@@ -9,19 +9,9 @@ import {
 } from 'react-native';
 
 import Timer from './Timer';
+import VideoPlayer from './VideoPlayer';
 import Device from '../DeviceType';
-import {
-  INITIAL_TIME,
-  COUNTDOWN_TIME,
-  NUMBER_OF_COUNTDOWN,
-  RUNNER_BORDER_COLOR,
-  STOPPER_BORDER_COLOR,
-  TOUCH_AREA_UNDERLAY_COLOR,
-  SETTING_ICON,
-  PLAY_ICON,
-  PAUSE_ICON,
-  RESET_ICON,
-} from '../Constant';
+import * as Constant from '../Constant';
 
 const styles = StyleSheet.create({
   container: {
@@ -39,7 +29,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0)',
     alignSelf: 'stretch',
     borderWidth: 10,
-    borderColor: STOPPER_BORDER_COLOR,
+    borderColor: Constant.STOPPER_BORDER_COLOR,
     borderRadius: 1,
   },
   touchInnerContainer: {
@@ -91,42 +81,59 @@ export default class GoTimer extends Component {
       timerPause: false,
       trunBlack: true,
       goSteps: 0,
-      numberOfCountdownForBlack: NUMBER_OF_COUNTDOWN,
-      numberOfCountdownForWhite: NUMBER_OF_COUNTDOWN,
+      numberOfCountdownForBlack: Constant.NUMBER_OF_COUNTDOWN,
+      numberOfCountdownForWhite: Constant.NUMBER_OF_COUNTDOWN,
     };
     this.timerForBlack = React.createRef();
     this.timerForWhite = React.createRef();
+    this.video = React.createRef();
+    this.clickPlayer = React.createRef();
+  }
+
+  componentDidUpdate() {
+    this.playVideoFromFisrtStart();
   }
 
   onCountdown = (isBlack) => {
-    const player = isBlack ? '黑方' : '白方';
-    console.log(`onCountdown..${player}開始讀秒`);
+    const initialTime = this.getInitialTime();
+    if (initialTime === 0) { return; }
+    const srcBlack = Constant.REF_BLACK_COUNTDOWN_START;
+    const srcWhite = Constant.REF_WHITE_COUNTDOWN_START;
+    const src = isBlack ? srcBlack : srcWhite;
+    this.video.current.play(src);
+  }
+
+  onTimeOver = (isBlack) => {
+    const srcBlack = Constant.REF_BLACK_LOST;
+    const srcWhite = Constant.REF_WHITE_LOST;
+    const src = isBlack ? srcBlack : srcWhite;
+    this.video.current.play(src);
   }
 
   onCountdownOver = (isBlack) => {
-    const player = isBlack ? '黑方' : '白方';
+    const {
+      REF_BLACK_COUNTDOWN_DEC,
+      REF_BLACK_COUNTDOWN_LAST,
+      REF_WHITE_COUNTDOWN_DEC,
+      REF_WHITE_COUNTDOWN_LAST,
+    } = Constant;
     let { numberOfCountdownForBlack, numberOfCountdownForWhite } = this.state;
+    let src;
+
     if (isBlack) {
       this.setState({ numberOfCountdownForBlack: numberOfCountdownForBlack -= 1 });
-      if (numberOfCountdownForBlack === 0) {
-        console.log(`onTimeOver..${player}輸了`);
-      } else {
-        console.log(`onCountdownOver..${player} ${COUNTDOWN_TIME} 秒 ${numberOfCountdownForBlack} 次`);
-      }
+      src = (numberOfCountdownForBlack === 1) ? REF_BLACK_COUNTDOWN_LAST : REF_BLACK_COUNTDOWN_DEC;
     } else {
       this.setState({ numberOfCountdownForWhite: numberOfCountdownForWhite -= 1 });
-      if (numberOfCountdownForWhite === 0) {
-        console.log(`onTimeOver..${player}輸了`);
-      } else {
-        console.log(`onCountdownOver..${player} ${COUNTDOWN_TIME} 秒 ${numberOfCountdownForWhite} 次`);
-      }
+      src = (numberOfCountdownForWhite === 1) ? REF_WHITE_COUNTDOWN_LAST : REF_WHITE_COUNTDOWN_DEC;
     }
+    this.video.current.play(src);
   }
 
   getInitialTime = () => {
     const { params } = this.props.navigation.state;
     if (typeof params === 'undefined') {
-      return INITIAL_TIME;
+      return Constant.INITIAL_TIME;
     }
     return params.initialTime;
   }
@@ -134,7 +141,7 @@ export default class GoTimer extends Component {
   getCountdownTime = () => {
     const { params } = this.props.navigation.state;
     if (typeof params === 'undefined') {
-      return COUNTDOWN_TIME;
+      return Constant.COUNTDOWN_TIME;
     }
     return params.countdownTime;
   }
@@ -142,17 +149,25 @@ export default class GoTimer extends Component {
   getNumberOfCountdown = () => {
     const { params } = this.props.navigation.state;
     if (typeof params === 'undefined') {
-      return NUMBER_OF_COUNTDOWN;
+      return Constant.NUMBER_OF_COUNTDOWN;
     }
     return params.numberOfCountdown;
   }
 
+  playVideoFromFisrtStart = () => {
+    const { REF_BLACK_START, REF_WHITE_START } = Constant;
+    const { goSteps, timerStart } = this.state;
+    if (!timerStart) { return; }
+    if (goSteps === 0) {
+      this.video.current.play(REF_BLACK_START);
+    } else if (goSteps === 1) {
+      this.video.current.play(REF_WHITE_START);
+    }
+  }
+
   currentNumberOfCountdown = (isBlack) => {
     const { numberOfCountdownForBlack, numberOfCountdownForWhite } = this.state;
-    if (isBlack) {
-      return numberOfCountdownForBlack;
-    }
-    return numberOfCountdownForWhite;
+    return isBlack ? numberOfCountdownForBlack : numberOfCountdownForWhite;
   }
 
   resetGoTimer = () => {
@@ -174,9 +189,9 @@ export default class GoTimer extends Component {
   runnerColor = (isBlack) => {
     const { timerStart, trunBlack } = this.state;
     if (timerStart && isBlack === trunBlack) {
-      return RUNNER_BORDER_COLOR;
+      return Constant.RUNNER_BORDER_COLOR;
     }
-    return STOPPER_BORDER_COLOR;
+    return Constant.STOPPER_BORDER_COLOR;
   }
 
   playStatusTrunMyself = isBlack => (
@@ -196,10 +211,9 @@ export default class GoTimer extends Component {
         numberOfCountdown={this.getNumberOfCountdown()}
         timerStart={this.playStatusTrunMyself(isBlack)}
         timerPause={this.state.timerPause}
-        // onTimeZero={() => console.log('onTimeZero..')}
         onCountdown={() => this.onCountdown(isBlack)}
         onCountdownOver={() => this.onCountdownOver(isBlack)}
-        onTimeOver={() => this.onCountdownOver(isBlack)}
+        onTimeOver={() => this.onTimeOver(isBlack)}
       />
       <View style={styles.stepContainer}>
         <Text>{this.state.goSteps}</Text>
@@ -227,11 +241,13 @@ export default class GoTimer extends Component {
           return null;
         }
         if (!timerStart) {
+          this.clickPlayer.current.play(Constant.CLICK_TIMER_MP3);
           this.setState({
             timerStart: true,
             timerPause: false,
           });
         } else {
+          this.clickPlayer.current.play(Constant.CLICK_TIMER_MP3);
           this.setState({
             trunBlack: !trunBlack,
             goSteps: this.state.goSteps += 1,
@@ -239,7 +255,8 @@ export default class GoTimer extends Component {
         }
         return null;
       }}
-      underlayColor={this.playStatusTrunMyselfNot(isBlack) ? null : TOUCH_AREA_UNDERLAY_COLOR}
+      underlayColor={this.playStatusTrunMyselfNot(isBlack) ?
+        null : Constant.TOUCH_AREA_UNDERLAY_COLOR}
     >
       {this.renderInnerObject(isBlack)}
     </TouchableHighlight>
@@ -274,7 +291,7 @@ export default class GoTimer extends Component {
       >
         <Image
           style={styles.icon}
-          source={SETTING_ICON}
+          source={Constant.SETTING_ICON}
         />
       </TouchableHighlight>
       <TouchableHighlight
@@ -283,19 +300,22 @@ export default class GoTimer extends Component {
       >
         <Image
           style={styles.icon}
-          source={RESET_ICON}
+          source={Constant.RESET_ICON}
         />
       </TouchableHighlight>
       <TouchableHighlight
         underlayColor={null}
-        onPress={() => this.setState({
-          timerStart: !this.state.timerStart,
-          timerPause: this.state.timerStart,
-        })}
+        onPress={() => {
+          this.clickPlayer.current.play(Constant.CLICK_TIMER_MP3);
+          this.setState({
+            timerStart: !this.state.timerStart,
+            timerPause: this.state.timerStart,
+          });
+        }}
       >
         <Image
           style={styles.icon}
-          source={this.state.timerStart ? PAUSE_ICON : PLAY_ICON}
+          source={this.state.timerStart ? Constant.PAUSE_ICON : Constant.PLAY_ICON}
         />
       </TouchableHighlight>
     </View>
@@ -307,6 +327,8 @@ export default class GoTimer extends Component {
         {this.renderTouchArea(true)}
         {this.renderSettingArea()}
         {this.renderTouchArea(false)}
+        <VideoPlayer ref={this.video} />
+        <VideoPlayer ref={this.clickPlayer} />
       </View>
     );
   }
@@ -318,10 +340,14 @@ GoTimer.propTypes = {
 
 /*
 
-To:
-  聲音
+to do list:
+  聲音 => onEvent、touch、countdown、lastCountdown
+  嗆聲綁於換對手時，才能使用，現次數不重複 => overMy 花兒謝了 烏龜你個蛋 科結語
   resetButton觸發modalView
   外觀
-bug:
+  直向鎖定
+  iOS APP icon
+  support Android
+bugs:
 
 */
