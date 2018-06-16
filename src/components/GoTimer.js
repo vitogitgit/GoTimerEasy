@@ -76,13 +76,14 @@ export default class GoTimer extends Component {
 
   constructor(props) {
     super(props);
+    const { numberOfCountdown } = props.navigation.state.params;
     this.state = {
       timerStart: false,
       timerPause: false,
       trunBlack: true,
       goSteps: 0,
-      numberOfCountdownForBlack: Constant.NUMBER_OF_COUNTDOWN,
-      numberOfCountdownForWhite: Constant.NUMBER_OF_COUNTDOWN,
+      numberOfCountdownForBlack: numberOfCountdown,
+      numberOfCountdownForWhite: numberOfCountdown,
     };
     this.timerForBlack = React.createRef();
     this.timerForWhite = React.createRef();
@@ -92,6 +93,7 @@ export default class GoTimer extends Component {
 
   componentDidUpdate() {
     this.playVideoFromFisrtStart();
+    this.playVideoFromLastCountdown();
   }
 
   onCountdown = (isBlack) => {
@@ -162,6 +164,22 @@ export default class GoTimer extends Component {
       this.video.current.play(REF_BLACK_START);
     } else if (goSteps === 1) {
       this.video.current.play(REF_WHITE_START);
+    }
+  }
+
+  playVideoFromLastCountdown = () => {
+    const { REF_BLACK_COUNTDOWN_LAST, REF_WHITE_COUNTDOWN_LAST } = Constant;
+    const {
+      trunBlack,
+      timerStart,
+      numberOfCountdownForBlack,
+      numberOfCountdownForWhite,
+    } = this.state;
+    if (!timerStart) { return; }
+    if (trunBlack && numberOfCountdownForBlack === 1) {
+      this.video.current.play(REF_BLACK_COUNTDOWN_LAST);
+    } else if (numberOfCountdownForWhite === 1) {
+      this.video.current.play(REF_WHITE_COUNTDOWN_LAST);
     }
   }
 
@@ -341,12 +359,10 @@ GoTimer.propTypes = {
 /*
 
 to do list:
-  聲音 => onEvent、touch、countdown、lastCountdown
-  嗆聲綁於換對手時，才能使用，現次數不重複 => overMy 花兒謝了 烏龜你個蛋 科結語
-  resetButton觸發modalView
-  外觀
-  直向鎖定
   iOS APP icon
+  resetButton觸發modalView
+  README.md
+  嗆聲綁於換對手時，才能使用，現次數不重複 => overMy 花兒謝了 烏龜你個蛋 科結語
   support Android
 bugs:
 
