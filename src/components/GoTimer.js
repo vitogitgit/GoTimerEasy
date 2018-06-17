@@ -178,7 +178,7 @@ export default class GoTimer extends Component {
     if (!timerStart) { return; }
     if (trunBlack && numberOfCountdownForBlack === 1) {
       this.video.current.play(REF_BLACK_COUNTDOWN_LAST);
-    } else if (numberOfCountdownForWhite === 1) {
+    } else if (!trunBlack && numberOfCountdownForWhite === 1) {
       this.video.current.play(REF_WHITE_COUNTDOWN_LAST);
     }
   }
