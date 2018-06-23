@@ -47,11 +47,13 @@ export const REF_BLACK_START = require('./sound/referee/black_start.mp3');
 export const REF_BLACK_LOST = require('./sound/referee/black_lost.mp3');
 export const REF_BLACK_COUNTDOWN_START = require('./sound/referee/black_countdown_start.mp3');
 export const REF_BLACK_COUNTDOWN_DEC = require('./sound/referee/black_countdown_dec.mp3');
+export const REF_BLACK_COUNTDOWN_TURN = require('./sound/referee/black_countdown_turn.mp3');
 export const REF_BLACK_COUNTDOWN_LAST = require('./sound/referee/black_countdown_last.mp3');
 export const REF_WHITE_START = require('./sound/referee/white_start.mp3');
 export const REF_WHITE_LOST = require('./sound/referee/white_lost.mp3');
 export const REF_WHITE_COUNTDOWN_START = require('./sound/referee/white_countdown_start.mp3');
 export const REF_WHITE_COUNTDOWN_DEC = require('./sound/referee/white_countdown_dec.mp3');
+export const REF_WHITE_COUNTDOWN_TURN = require('./sound/referee/white_countdown_turn.mp3');
 export const REF_WHITE_COUNTDOWN_LAST = require('./sound/referee/white_countdown_last.mp3');
 
 // 讀秒聲音

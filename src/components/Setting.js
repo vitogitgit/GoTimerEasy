@@ -190,12 +190,19 @@ export default class Setting extends Component {
   renderPickerItems = (initial, increase, limit, displayRatio = 1) => {
     const items = [];
     for (let number = initial; number <= limit; number += increase) {
+      let temp = 0;
+      if (number === 0) {
+        temp = 3;
+        number += temp;
+      }
+
       items.push( // eslint-disable-line function-paren-newline
         <Picker.Item
           key={number}
           label={(number / displayRatio).toString()}
           value={number}
         />);
+      number -= temp;
     }
     return items;
   }

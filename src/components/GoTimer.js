@@ -132,29 +132,9 @@ export default class GoTimer extends Component {
     this.video.current.play(src);
   }
 
-  getInitialTime = () => {
-    const { params } = this.props.navigation.state;
-    if (typeof params === 'undefined') {
-      return Constant.INITIAL_TIME;
-    }
-    return params.initialTime;
-  }
-
-  getCountdownTime = () => {
-    const { params } = this.props.navigation.state;
-    if (typeof params === 'undefined') {
-      return Constant.COUNTDOWN_TIME;
-    }
-    return params.countdownTime;
-  }
-
-  getNumberOfCountdown = () => {
-    const { params } = this.props.navigation.state;
-    if (typeof params === 'undefined') {
-      return Constant.NUMBER_OF_COUNTDOWN;
-    }
-    return params.numberOfCountdown;
-  }
+  getInitialTime = () => this.props.navigation.state.params.initialTime
+  getCountdownTime = () => this.props.navigation.state.params.countdownTime
+  getNumberOfCountdown = () => this.props.navigation.state.params.numberOfCountdown
 
   playVideoFromFisrtStart = () => {
     const { REF_BLACK_START, REF_WHITE_START } = Constant;
@@ -168,7 +148,15 @@ export default class GoTimer extends Component {
   }
 
   playVideoFromLastCountdown = () => {
-    const { REF_BLACK_COUNTDOWN_LAST, REF_WHITE_COUNTDOWN_LAST } = Constant;
+    const { play } = this.video.current;
+    const isCountdownForBlack = this.timerForBlack.current.state.isCountdown;
+    const isCountdownForWhite = this.timerForWhite.current.state.isCountdown;
+    const {
+      REF_BLACK_COUNTDOWN_LAST,
+      REF_WHITE_COUNTDOWN_LAST,
+      REF_BLACK_COUNTDOWN_TURN,
+      REF_WHITE_COUNTDOWN_TURN,
+    } = Constant;
     const {
       trunBlack,
       timerStart,
@@ -176,10 +164,20 @@ export default class GoTimer extends Component {
       numberOfCountdownForWhite,
     } = this.state;
     if (!timerStart) { return; }
-    if (trunBlack && numberOfCountdownForBlack === 1) {
-      this.video.current.play(REF_BLACK_COUNTDOWN_LAST);
-    } else if (!trunBlack && numberOfCountdownForWhite === 1) {
-      this.video.current.play(REF_WHITE_COUNTDOWN_LAST);
+    if (trunBlack) {
+      if (!isCountdownForBlack) { return; }
+      if (numberOfCountdownForBlack === 1) {
+        play(REF_BLACK_COUNTDOWN_LAST);
+      } else {
+        play(REF_BLACK_COUNTDOWN_TURN);
+      }
+    } else if (!trunBlack) {
+      if (!isCountdownForWhite) { return; }
+      if (numberOfCountdownForWhite === 1) {
+        play(REF_WHITE_COUNTDOWN_LAST);
+      } else {
+        play(REF_WHITE_COUNTDOWN_TURN);
+      }
     }
   }
 
@@ -281,12 +279,7 @@ export default class GoTimer extends Component {
   )
 
   renderTouchArea = (isBlack) => {
-    this.transformFlip = [];
-
-    if (isBlack) {
-      this.transformFlip = [{ rotate: '180deg' }];
-    }
-
+    this.transformFlip = isBlack ? [{ rotate: '180deg' }] : [];
     return (this.renderTouchable(isBlack));
   }
 
@@ -359,11 +352,12 @@ GoTimer.propTypes = {
 /*
 
 to do list:
-  iOS APP icon
+  結束後，點豬頭無法繼續，發出叫聲
   resetButton觸發modalView
   README.md
   嗆聲綁於換對手時，才能使用，現次數不重複 => overMy 花兒謝了 烏龜你個蛋 科結語
   support Android
 bugs:
+  重設按鈕，於基本時限為零時，顯示尚有問題
 
 */
