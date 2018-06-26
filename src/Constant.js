@@ -39,8 +39,10 @@ export const PATTERN_FAST_ICON = require('./image/settingPage/set_short_lion.png
 export const PATTERN_MEDIUN_ICON = require('./image/settingPage/set_medium_rabbit.png');
 export const PATTERN_SLOW_ICON = require('./image/settingPage/set_long_tortoise.png');
 
+// 聲音
 export const QUICK_FLOWER_WAV = require('./sound/quick.wav');
 export const CLICK_TIMER_MP3 = require('./sound/click.mp3');
+export const MINECRAFT_PIG_MP3 = require('./sound/minecraft-pig.mp3');
 
 // 裁判聲音
 export const REF_BLACK_START = require('./sound/referee/black_start.mp3');
