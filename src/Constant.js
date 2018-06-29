@@ -1,6 +1,4 @@
-// export const INITIAL_TIME = 3;
 export const INITIAL_TIME = 1800;
-// export const COUNTDOWN_TIME = 6;
 export const COUNTDOWN_TIME = 30;
 export const NUMBER_OF_COUNTDOWN = 3;
 
@@ -26,6 +24,9 @@ export const PATTERN_FAST_TEXT = '快棋';
 export const PATTERN_MEDIUN_TEXT = '中等';
 export const PATTERN_SLOW_TEXT = '慢棋';
 export const LOCAL_STORAGE_KEY_RULES = 'rules';
+export const IS_RESET = ' 要重置設定嗎?';
+export const CANCEL = '取消';
+export const CONFIRM = '確定';
 
 /* eslint-disable global-require */
 

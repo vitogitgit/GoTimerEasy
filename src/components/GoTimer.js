@@ -9,6 +9,7 @@ import {
 import styles from './GoTimerStyle';
 import Timer from './Timer';
 import VideoPlayer from './VideoPlayer';
+import Dialog from './Dialog';
 import * as Controller from './GoTimerController';
 import * as Constant from '../Constant';
 
@@ -24,6 +25,7 @@ export default class GoTimer extends Component {
       timerStart: false,
       timerPause: false,
       trunBlack: true,
+      showDialog: false,
       goSteps: 0,
       numberOfCountdownForBlack: numberOfCountdown,
       numberOfCountdownForWhite: numberOfCountdown,
@@ -117,6 +119,14 @@ export default class GoTimer extends Component {
     });
   }
 
+  openDialog = () => this.setState({
+    showDialog: true,
+    timerStart: false,
+    timerPause: true,
+  });
+
+  closeDialog = () => this.setState({ showDialog: false });
+
   resetGoTimer = () => {
     this.timerForBlack.current.resetTimer();
     this.timerForWhite.current.resetTimer();
@@ -195,7 +205,7 @@ export default class GoTimer extends Component {
       </TouchableHighlight>
       <TouchableHighlight
         underlayColor={null}
-        onPress={() => this.resetGoTimer()}
+        onPress={() => this.openDialog()}
       >
         <Image
           style={styles.icon}
@@ -214,12 +224,24 @@ export default class GoTimer extends Component {
     </View>
   )
 
+  renderDialog = () => {
+    const { showDialog } = this.state;
+    if (!showDialog) { return null; }
+    return (
+      <Dialog
+        closeDialog={this.closeDialog}
+        resetGoTimer={this.resetGoTimer}
+      />
+    );
+  }
+
   render() {
     return (
       <View style={styles.container}>
         {this.renderTouchArea(true)}
         {this.renderSettingArea()}
         {this.renderTouchArea(false)}
+        {this.renderDialog()}
         <VideoPlayer ref={this.video} />
         <VideoPlayer ref={this.clickPlayer} />
       </View>
