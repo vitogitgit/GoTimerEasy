@@ -56,6 +56,11 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
   },
+  rulesText: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#6c5ce7',
+  },
 });
 
 export default styles;

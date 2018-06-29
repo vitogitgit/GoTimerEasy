@@ -1,150 +1,10 @@
 import React, { Component } from 'react';
-import { View, Text, Image, StyleSheet, TouchableHighlight, Picker } from 'react-native';
+import { View, Text, Image, TouchableHighlight, Picker } from 'react-native';
 import PropTypes from 'prop-types';
 import * as Constant from '../Constant';
 import { setLocalStorage } from '../LocalStorage';
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-  },
-  rulesContainer: {
-    flexDirection: 'row',
-    alignSelf: 'stretch',
-    justifyContent: 'space-evenly',
-    marginTop: 70,
-    marginBottom: 70,
-  },
-  pickerContainer: {
-    height: 300,
-    width: 100,
-  },
-  settingButton: {
-    position: 'absolute',
-    bottom: 20,
-    left: 20,
-    right: 20,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: '#2E8B57',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  buttonText: {
-    fontSize: 22,
-    fontWeight: '300',
-    color: 'white',
-  },
-  rulesText: {
-    fontSize: 18,
-    fontWeight: '300',
-  },
-  pickerItemLabel: {
-    fontSize: 30,
-  },
-  patternContainer: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: 230,
-  },
-  patternText: {
-    position: 'absolute',
-    right: 5,
-    bottom: 5,
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  patternIcon: {
-    width: 120,
-    height: 120,
-  },
-});
-
-const scoreFromInitialTime = (initialTime) => {
-  if (initialTime < 1200) {
-    return 11;
-  } else if (initialTime <= 2100) {
-    return 5;
-  } else if (initialTime <= 3000) {
-    return -1;
-  }
-  return -10;
-};
-
-const scoreFromCountdownTime = (countdownTime, score) => {
-  const movingValue = ((countdownTime / 5) - 6) * -2;
-  return score + movingValue;
-};
-
-const scoreFromNumberOfCountdown = (numberOfCountdown, score) => {
-  const movingValue = (numberOfCountdown - 3) * -2;
-  return score + movingValue;
-};
-
-const getPatternParm = (score) => {
-  const {
-    PATTERN_SLOW_ICON,
-    PATTERN_MEDIUN_ICON,
-    PATTERN_FAST_ICON,
-    PATTERN_SLOW_TEXT,
-    PATTERN_MEDIUN_TEXT,
-    PATTERN_FAST_TEXT,
-    PATTERN_SLOW_COLOR,
-    PATTERN_MEDIUN_COLOR,
-    PATTERN_FAST_COLOR,
-  } = Constant;
-  let icon = PATTERN_FAST_ICON;
-  let text = PATTERN_FAST_TEXT;
-  let textColor = PATTERN_FAST_COLOR;
-  if (score < 0) {
-    icon = PATTERN_SLOW_ICON;
-    text = PATTERN_SLOW_TEXT;
-    textColor = PATTERN_SLOW_COLOR;
-  } else if (score <= 10) {
-    icon = PATTERN_MEDIUN_ICON;
-    text = PATTERN_MEDIUN_TEXT;
-    textColor = PATTERN_MEDIUN_COLOR;
-  }
-  return {
-    icon,
-    text,
-    textColor: { color: textColor },
-  };
-};
-
-const setPatternType = (state) => {
-  const { initialTime, countdownTime, numberOfCountdown } = state;
-  let score = scoreFromInitialTime(initialTime);
-  score = scoreFromCountdownTime(countdownTime, score);
-  score = scoreFromNumberOfCountdown(numberOfCountdown, score);
-  return getPatternParm(score);
-};
-
-const getPickerData = component => ({
-  initialTime: [
-    component.state.initialTime,
-    component.updateInitialTime,
-    0,
-    300,
-    Constant.INITIAL_TIME_LIMIT,
-    60,
-  ],
-  countdownTime: [
-    component.state.countdownTime,
-    component.updateCountdownTime,
-    10,
-    5,
-    Constant.COUNTDOWN_TIME_LIMIT,
-  ],
-  numberOfCountdown: [
-    component.state.numberOfCountdown,
-    component.updateNumberOfCountdown,
-    1,
-    1,
-    Constant.NUMBER_OF_COUNTDOWN_LIMIT,
-  ],
-});
+import styles from './SettingStyle';
+import * as Controller from './SettingController';
 
 export default class Setting extends Component {
   static navigationOptions = {
@@ -220,7 +80,7 @@ export default class Setting extends Component {
   )
 
   renderSettingBlock = () => {
-    const pickerData = getPickerData(this);
+    const pickerData = Controller.getPickerData(this);
     const { initialTime, countdownTime, numberOfCountdown } = pickerData;
     return (
       <View style={{ flexDirection: 'row' }}>
@@ -232,7 +92,7 @@ export default class Setting extends Component {
   }
 
   renderPatternImage = () => {
-    const pattern = setPatternType(this.state);
+    const pattern = Controller.setPatternType(this.state);
     return (
       <View style={styles.patternContainer}>
         <Text style={[styles.patternText, pattern.textColor]}>

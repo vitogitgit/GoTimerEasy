@@ -15,6 +15,58 @@ const styles = StyleSheet.create({
   },
 });
 
+const playVideoByCountdown = (prevState, component) => {
+  const { isCountdown, seconds } = component.state;
+  if (!isCountdown || prevState.seconds === seconds || seconds > 8) { return; }
+
+  let src;
+  switch (seconds) {
+    case 1:
+      src = Constant.SOUND_NUMBER_1;
+      break;
+    case 2:
+      src = Constant.SOUND_NUMBER_2;
+      break;
+    case 3:
+      src = Constant.SOUND_NUMBER_3;
+      break;
+    case 4:
+      src = Constant.SOUND_NUMBER_4;
+      break;
+    case 5:
+      src = Constant.SOUND_NUMBER_5;
+      break;
+    case 6:
+      src = Constant.SOUND_NUMBER_6;
+      break;
+    case 7:
+      src = Constant.SOUND_NUMBER_7;
+      break;
+    case 8:
+      src = Constant.SOUND_NUMBER_8;
+      break;
+    default:
+      return;
+  }
+  component.countdownVideo.current.play(src);
+};
+
+const setCurrentMinutes = (seconds) => {
+  let minutes = parseInt(seconds / 60, 10);
+  if (minutes < 10) {
+    minutes = `0${minutes.toString()}`;
+  }
+  return minutes;
+};
+
+const setCurrentSeconds = (seconds) => {
+  let second = seconds % 60;
+  if (second < 10) {
+    second = `0${second.toString()}`;
+  }
+  return second;
+};
+
 export default class Timer extends Component {
   constructor(props) {
     super(props);
@@ -60,7 +112,7 @@ export default class Timer extends Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    this.playVideoByCountdown(prevState);
+    playVideoByCountdown(prevState, this);
   }
 
   settingTimer = () => {
@@ -106,42 +158,6 @@ export default class Timer extends Component {
     return this.setState({ seconds: seconds - 1 });
   }
 
-  playVideoByCountdown = (prevState) => {
-    const { isCountdown, seconds } = this.state;
-    if (!isCountdown || prevState.seconds === seconds || seconds > 8) { return; }
-
-    let src;
-    switch (seconds) {
-      case 1:
-        src = Constant.SOUND_NUMBER_1;
-        break;
-      case 2:
-        src = Constant.SOUND_NUMBER_2;
-        break;
-      case 3:
-        src = Constant.SOUND_NUMBER_3;
-        break;
-      case 4:
-        src = Constant.SOUND_NUMBER_4;
-        break;
-      case 5:
-        src = Constant.SOUND_NUMBER_5;
-        break;
-      case 6:
-        src = Constant.SOUND_NUMBER_6;
-        break;
-      case 7:
-        src = Constant.SOUND_NUMBER_7;
-        break;
-      case 8:
-        src = Constant.SOUND_NUMBER_8;
-        break;
-      default:
-        return;
-    }
-    this.countdownVideo.current.play(src);
-  }
-
   resetTimer = () => {
     clearInterval(this.timer);
     setTimeout(() => {
@@ -165,16 +181,8 @@ export default class Timer extends Component {
       );
     }
 
-    let minutes = parseInt(seconds / 60, 10);
-    if (minutes < 10) {
-      minutes = `0${minutes.toString()}`;
-    }
-
-    let second = seconds % 60;
-    if (second < 10) {
-      second = `0${second.toString()}`;
-    }
-
+    const minutes = setCurrentMinutes(seconds);
+    const second = setCurrentSeconds(seconds);
     return (
       <View>
         <Text style={styles.secondText}>{`${minutes}:${second}`}</Text>
