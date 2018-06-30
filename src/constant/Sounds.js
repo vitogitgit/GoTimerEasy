@@ -26,10 +26,20 @@ export default {
     SOUND_NUMBER_8: require('../assets/sound/number/number_8.mp3'),
   },
   taunt: {
-    QUICK_FLOWER_WAV: require('../assets/sound/quick.wav'),
+    TAUNT_HINT_THREE: require('../assets/sound/taunt/taunt_hint_three.mp3'),
+    TAUNT_HINT_ZERO: require('../assets/sound/taunt/taunt_hint_zero.mp3'),
+    TAUNT_HINT_STOP: require('../assets/sound/taunt/taunt_hint_stop.mp3'),
+    random: [
+      require('../assets/sound/taunt/taunt_quick.mp3'),
+      require('../assets/sound/taunt/taunt_badHand.mp3'),
+      require('../assets/sound/taunt/taunt_blood.mp3'),
+      require('../assets/sound/taunt/taunt_moral.mp3'),
+      require('../assets/sound/taunt/taunt_work.mp3'),
+      require('../assets/sound/taunt/taunt_overMyDeadBody.mp3'),
+    ],
   },
   click: {
-    CLICK_TIMER_MP3: require('../assets/sound/click.mp3'),
-    MINECRAFT_PIG_MP3: require('../assets/sound/minecraft-pig.mp3'),
+    CLICK_TIMER_MP3: require('../assets/sound/click/click.mp3'),
+    MINECRAFT_PIG_MP3: require('../assets/sound/click/minecraft-pig.mp3'),
   },
 };

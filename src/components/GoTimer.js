@@ -13,6 +13,7 @@ import Dialog from './Dialog';
 import * as Controller from './GoTimerController';
 import Sounds from '../constant/Sounds';
 import Images from '../constant/Images';
+import Numbers from '../constant/Numbers';
 
 export default class GoTimer extends Component {
   static navigationOptions = {
@@ -121,11 +122,40 @@ export default class GoTimer extends Component {
   }
 
   setInitialVar = () => {
+    const { NUMBER_OF_TAUNT } = Numbers.defaultRules;
     this.var = {
       gameOver: false,
-      numberOfTauntsForBlack: 10,
-      numberOfTauntsForWhite: 10,
+      numberOfTauntsForBlack: NUMBER_OF_TAUNT,
+      numberOfTauntsForWhite: NUMBER_OF_TAUNT,
     };
+  }
+
+  setTauntSource = (numberOfTaunts) => {
+    const {
+      TAUNT_HINT_THREE,
+      TAUNT_HINT_ZERO,
+      TAUNT_HINT_STOP,
+      random,
+    } = Sounds.taunt;
+    const randomBetweenArray = Math.floor(Math.random() * random.length);
+    let src = random[randomBetweenArray];
+
+    switch (numberOfTaunts) {
+      case -1:
+        this.var.numberOfTauntsForBlack = 0;
+        this.var.numberOfTauntsForWhite = 0;
+        src = TAUNT_HINT_STOP;
+        break;
+      case 1:
+        src = TAUNT_HINT_ZERO;
+        break;
+      case 4:
+        src = TAUNT_HINT_THREE;
+        break;
+      default:
+        break;
+    }
+    return src;
   }
 
   openDialog = () => this.setState({
@@ -136,16 +166,17 @@ export default class GoTimer extends Component {
 
   triggeringTauntEvent = (isBlack) => {
     const { numberOfTauntsForBlack, numberOfTauntsForWhite } = this.var;
+    let src;
     if (isBlack) {
       if (numberOfTauntsForBlack === 0) { return null; }
       this.var.numberOfTauntsForBlack -= 1;
-      this.video.current.play(Sounds.taunt.QUICK_FLOWER_WAV);
+      src = this.setTauntSource(numberOfTauntsForBlack);
     } else {
       if (numberOfTauntsForWhite === 0) { return null; }
       this.var.numberOfTauntsForWhite -= 1;
-      this.video.current.play(Sounds.taunt.QUICK_FLOWER_WAV);
+      src = this.setTauntSource(numberOfTauntsForWhite);
     }
-    console.log('this.var --> ', this.var);
+    this.video.current.play(src);
     return null;
   }
 
@@ -178,7 +209,11 @@ export default class GoTimer extends Component {
         numberOfCountdown={Controller.getNumberOfCountdown(this)}
         timerStart={Controller.playStatusTrunMe(isBlack, this)}
         timerPause={this.state.timerPause}
-        onCountdown={() => Controller.onCountdown(isBlack, this)}
+        onCountdown={() => {
+          Controller.onCountdown(isBlack, this);
+          this.var.numberOfTauntsForBlack = -1;
+          this.var.numberOfTauntsForWhite = -1;
+        }}
         onCountdownOver={() => this.onCountdownOver(isBlack)}
         onTimeOver={() => this.onTimeOver(isBlack)}
       />
@@ -281,7 +316,6 @@ GoTimer.propTypes = {
 /*
 
 to do list:
-  嗆聲綁於換對手時，才能使用，現次數不重複 => overMy 花兒謝了 烏龜你個蛋 科結語
   README.md
   support ios 各個手機、平板
   support Android

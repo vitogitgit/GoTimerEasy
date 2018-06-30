@@ -3,6 +3,7 @@ export default {
     INITIAL_TIME: 1800,
     COUNTDOWN_TIME: 30,
     NUMBER_OF_COUNTDOWN: 3,
+    NUMBER_OF_TAUNT: 10,
   },
   settingPage: {
     INITIAL_TIME_LIMIT: 3600,
