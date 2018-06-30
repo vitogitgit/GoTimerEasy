@@ -1,4 +1,7 @@
-import * as Constant from '../Constant';
+import { elseStyle } from './SettingStyle';
+import Strings from '../constant/Strings';
+import Numbers from '../constant/Numbers';
+import Images from '../constant/Images';
 
 export const scoreFromInitialTime = (initialTime) => {
   if (initialTime < 1200) {
@@ -23,16 +26,12 @@ export const scoreFromNumberOfCountdown = (numberOfCountdown, score) => {
 
 export const getPatternParm = (score) => {
   const {
-    PATTERN_SLOW_ICON,
-    PATTERN_MEDIUN_ICON,
-    PATTERN_FAST_ICON,
-    PATTERN_SLOW_TEXT,
-    PATTERN_MEDIUN_TEXT,
-    PATTERN_FAST_TEXT,
     PATTERN_SLOW_COLOR,
     PATTERN_MEDIUN_COLOR,
     PATTERN_FAST_COLOR,
-  } = Constant;
+  } = elseStyle;
+  const { PATTERN_SLOW_ICON, PATTERN_MEDIUN_ICON, PATTERN_FAST_ICON } = Images.settingPage;
+  const { PATTERN_FAST_TEXT, PATTERN_SLOW_TEXT, PATTERN_MEDIUN_TEXT } = Strings.settingPage;
   let icon = PATTERN_FAST_ICON;
   let text = PATTERN_FAST_TEXT;
   let textColor = PATTERN_FAST_COLOR;
@@ -66,7 +65,7 @@ export const getPickerData = component => ({
     component.updateInitialTime,
     0,
     300,
-    Constant.INITIAL_TIME_LIMIT,
+    Numbers.settingPage.INITIAL_TIME_LIMIT,
     60,
   ],
   countdownTime: [
@@ -74,13 +73,13 @@ export const getPickerData = component => ({
     component.updateCountdownTime,
     10,
     5,
-    Constant.COUNTDOWN_TIME_LIMIT,
+    Numbers.settingPage.COUNTDOWN_TIME_LIMIT,
   ],
   numberOfCountdown: [
     component.state.numberOfCountdown,
     component.updateNumberOfCountdown,
     1,
     1,
-    Constant.NUMBER_OF_COUNTDOWN_LIMIT,
+    Numbers.settingPage.NUMBER_OF_COUNTDOWN_LIMIT,
   ],
 });

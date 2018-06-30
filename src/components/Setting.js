@@ -1,14 +1,14 @@
 import React, { Component } from 'react';
 import { View, Text, Image, TouchableHighlight, Picker } from 'react-native';
 import PropTypes from 'prop-types';
-import * as Constant from '../Constant';
+import Strings from '../constant/Strings';
 import { setLocalStorage } from '../LocalStorage';
-import styles from './SettingStyle';
+import styles, { elseStyle } from './SettingStyle';
 import * as Controller from './SettingController';
 
 export default class Setting extends Component {
   static navigationOptions = {
-    title: Constant.SETTING_SCREEN_TITLE,
+    title: Strings.settingPage.SETTING_SCREEN_TITLE,
   };
 
   constructor(props) {
@@ -34,10 +34,16 @@ export default class Setting extends Component {
   }
 
   renderRules = () => {
+    const {
+      INITIAL_TIME_TITLE,
+      INITIAL_TIME_UNIT,
+      COUNTDOWN_TIME_TITLE,
+      NUMBER_OF_COUNTDOWN_TITLE,
+    } = Strings.settingPage;
     const { initialTime, countdownTime, numberOfCountdown } = this.state;
-    const basicTimeText = `${Constant.INITIAL_TIME_TITLE}: ${initialTime / 60}${Constant.INITIAL_TIME_UNIT}`;
-    const countdownTimeText = `${Constant.COUNTDOWN_TIME_TITLE}: ${countdownTime}`;
-    const numberOfCountdownText = `${Constant.NUMBER_OF_COUNTDOWN_TITLE}: ${numberOfCountdown}`;
+    const basicTimeText = `${INITIAL_TIME_TITLE}: ${initialTime / 60}${INITIAL_TIME_UNIT}`;
+    const countdownTimeText = `${COUNTDOWN_TIME_TITLE}: ${countdownTime}`;
+    const numberOfCountdownText = `${NUMBER_OF_COUNTDOWN_TITLE}: ${numberOfCountdown}`;
     return (
       <View style={styles.rulesContainer}>
         <Text style={styles.rulesText}>{basicTimeText}</Text>
@@ -107,6 +113,7 @@ export default class Setting extends Component {
   }
 
   renderSettingButton = () => {
+    const { LOCAL_STORAGE_KEY_RULES } = Strings.else;
     const settingData = {
       initialTime: this.state.initialTime,
       countdownTime: this.state.countdownTime,
@@ -115,15 +122,15 @@ export default class Setting extends Component {
     return (
       <TouchableHighlight
         style={styles.settingButton}
-        underlayColor={Constant.SETTING_BUTTON_UNDERLAY_COLOR}
+        underlayColor={elseStyle.SETTING_BUTTON_UNDERLAY_COLOR}
         onPress={() => {
-          setLocalStorage(Constant.LOCAL_STORAGE_KEY_RULES, settingData);
+          setLocalStorage(LOCAL_STORAGE_KEY_RULES, settingData);
           const { navigation } = this.props;
           navigation.navigate('Home', settingData);
           navigation.state.params.resetGoTimer();
         }}
       >
-        <Text style={styles.buttonText}>{Constant.SETTING_BUTTON_TEXT}</Text>
+        <Text style={styles.buttonText}>{Strings.settingPage.SETTING_BUTTON_TEXT}</Text>
       </TouchableHighlight>
     );
   }

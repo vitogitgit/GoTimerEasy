@@ -2,7 +2,7 @@ import React from 'react';
 import { Modal, View, TouchableHighlight, Text } from 'react-native';
 import PropTypes from 'prop-types';
 import { styles, underlayColor } from './DialogStyle';
-import * as Constant from '../Constant';
+import Strings from '../constant/Strings';
 
 const Dialog = props => (
   <Modal
@@ -17,14 +17,14 @@ const Dialog = props => (
         <View />
       </TouchableHighlight>
       <View style={styles.dialogContainer}>
-        <Text style={styles.title}>{Constant.IS_RESET}</Text>
+        <Text style={styles.title}>{Strings.dialog.IS_RESET}</Text>
         <View style={styles.buttonsContainer}>
           <TouchableHighlight
             style={[styles.button, styles.cancelButton]}
             underlayColor={underlayColor.cancel}
             onPress={() => props.closeDialog()}
           >
-            <Text style={[styles.buttonText, styles.cancelText]}>{Constant.CANCEL}</Text>
+            <Text style={[styles.buttonText, styles.cancelText]}>{Strings.dialog.CANCEL}</Text>
           </TouchableHighlight>
           <TouchableHighlight
             style={styles.button}
@@ -34,7 +34,7 @@ const Dialog = props => (
               props.resetGoTimer();
             }}
           >
-            <Text style={styles.buttonText}>{Constant.CONFIRM}</Text>
+            <Text style={styles.buttonText}>{Strings.dialog.CONFIRM}</Text>
           </TouchableHighlight>
         </View>
       </View>

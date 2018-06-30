@@ -58,3 +58,10 @@ const styles = StyleSheet.create({
 });
 
 export default styles;
+
+export const elseStyle = {
+  SETTING_BUTTON_UNDERLAY_COLOR: '#9c88ff',
+  PATTERN_FAST_COLOR: '#eb4d4b',
+  PATTERN_MEDIUN_COLOR: '#686de0',
+  PATTERN_SLOW_COLOR: '#6ab04c',
+};

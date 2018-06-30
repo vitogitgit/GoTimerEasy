@@ -6,12 +6,13 @@ import {
   Image,
   TouchableHighlight,
 } from 'react-native';
-import styles from './GoTimerStyle';
+import styles, { elseStyle } from './GoTimerStyle';
 import Timer from './Timer';
 import VideoPlayer from './VideoPlayer';
 import Dialog from './Dialog';
 import * as Controller from './GoTimerController';
-import * as Constant from '../Constant';
+import Sounds from '../constant/Sounds';
+import Images from '../constant/Images';
 
 export default class GoTimer extends Component {
   static navigationOptions = {
@@ -30,7 +31,7 @@ export default class GoTimer extends Component {
       numberOfCountdownForBlack: numberOfCountdown,
       numberOfCountdownForWhite: numberOfCountdown,
     };
-    this.gameOver = false;
+    this.setInitialVar();
     this.timerForBlack = React.createRef();
     this.timerForWhite = React.createRef();
     this.video = React.createRef();
@@ -43,11 +44,11 @@ export default class GoTimer extends Component {
   }
 
   onTimeOver = (isBlack) => {
-    const srcBlack = Constant.REF_BLACK_LOST;
-    const srcWhite = Constant.REF_WHITE_LOST;
+    const srcBlack = Sounds.referee.REF_BLACK_LOST;
+    const srcWhite = Sounds.referee.REF_WHITE_LOST;
     const src = isBlack ? srcBlack : srcWhite;
     this.video.current.play(src);
-    this.gameOver = true;
+    this.var.gameOver = true;
   }
 
   onCountdownOver = (isBlack) => {
@@ -56,7 +57,7 @@ export default class GoTimer extends Component {
       REF_BLACK_COUNTDOWN_LAST,
       REF_WHITE_COUNTDOWN_DEC,
       REF_WHITE_COUNTDOWN_LAST,
-    } = Constant;
+    } = Sounds.referee;
     let { numberOfCountdownForBlack, numberOfCountdownForWhite } = this.state;
     let src;
 
@@ -72,20 +73,20 @@ export default class GoTimer extends Component {
 
   onPressTouchArea = (isBlack) => {
     const { timerStart, trunBlack } = this.state;
-    if (Controller.playStatusTrunYou(isBlack, this)) {
-      return null;
-    } else if (this.gameOver) {
-      return this.clickPlayer.current.play(Constant.MINECRAFT_PIG_MP3);
+    if (Controller.playStatusTrunOpponent(isBlack, this)) {
+      return this.triggeringTauntEvent(isBlack);
+    } else if (this.var.gameOver) {
+      return this.clickPlayer.current.play(Sounds.click.MINECRAFT_PIG_MP3);
     }
 
     if (!timerStart) {
-      this.clickPlayer.current.play(Constant.CLICK_TIMER_MP3);
+      this.clickPlayer.current.play(Sounds.click.CLICK_TIMER_MP3);
       this.setState({
         timerStart: true,
         timerPause: false,
       });
     } else {
-      this.clickPlayer.current.play(Constant.CLICK_TIMER_MP3);
+      this.clickPlayer.current.play(Sounds.click.CLICK_TIMER_MP3);
       this.setState({
         trunBlack: !trunBlack,
         goSteps: this.state.goSteps += 1,
@@ -108,15 +109,23 @@ export default class GoTimer extends Component {
   }
 
   onPressPlayButton = () => {
-    if (this.gameOver) {
-      this.clickPlayer.current.play(Constant.MINECRAFT_PIG_MP3);
+    if (this.var.gameOver) {
+      this.clickPlayer.current.play(Sounds.click.MINECRAFT_PIG_MP3);
       return;
     }
-    this.clickPlayer.current.play(Constant.CLICK_TIMER_MP3);
+    this.clickPlayer.current.play(Sounds.click.CLICK_TIMER_MP3);
     this.setState({
       timerStart: !this.state.timerStart,
       timerPause: this.state.timerStart,
     });
+  }
+
+  setInitialVar = () => {
+    this.var = {
+      gameOver: false,
+      numberOfTauntsForBlack: 10,
+      numberOfTauntsForWhite: 10,
+    };
   }
 
   openDialog = () => this.setState({
@@ -125,18 +134,34 @@ export default class GoTimer extends Component {
     timerPause: true,
   });
 
+  triggeringTauntEvent = (isBlack) => {
+    const { numberOfTauntsForBlack, numberOfTauntsForWhite } = this.var;
+    if (isBlack) {
+      if (numberOfTauntsForBlack === 0) { return null; }
+      this.var.numberOfTauntsForBlack -= 1;
+      this.video.current.play(Sounds.taunt.QUICK_FLOWER_WAV);
+    } else {
+      if (numberOfTauntsForWhite === 0) { return null; }
+      this.var.numberOfTauntsForWhite -= 1;
+      this.video.current.play(Sounds.taunt.QUICK_FLOWER_WAV);
+    }
+    console.log('this.var --> ', this.var);
+    return null;
+  }
+
   closeDialog = () => this.setState({ showDialog: false });
 
   resetGoTimer = () => {
     this.timerForBlack.current.resetTimer();
     this.timerForWhite.current.resetTimer();
-    this.gameOver = false;
+    this.setInitialVar();
     setTimeout(() => {
       const numberOfCountdown = Controller.getNumberOfCountdown(this);
       this.setState({
         timerStart: false,
         timerPause: false,
         trunBlack: true,
+        showDialog: false,
         goSteps: 0,
         numberOfCountdownForBlack: numberOfCountdown,
         numberOfCountdownForWhite: numberOfCountdown,
@@ -180,8 +205,8 @@ export default class GoTimer extends Component {
         { borderColor: Controller.runnerColor(isBlack, this) },
       ]}
       onPress={() => this.onPressTouchArea(isBlack)}
-      underlayColor={Controller.playStatusTrunYou(isBlack, this) ?
-        null : Constant.TOUCH_AREA_UNDERLAY_COLOR}
+      underlayColor={Controller.playStatusTrunOpponent(isBlack, this) ?
+        null : elseStyle.TOUCH_AREA_UNDERLAY_COLOR}
     >
       {this.renderInnerObject(isBlack)}
     </TouchableHighlight>
@@ -200,7 +225,7 @@ export default class GoTimer extends Component {
       >
         <Image
           style={styles.icon}
-          source={Constant.SETTING_ICON}
+          source={Images.goTimer.SETTING_ICON}
         />
       </TouchableHighlight>
       <TouchableHighlight
@@ -209,7 +234,7 @@ export default class GoTimer extends Component {
       >
         <Image
           style={styles.icon}
-          source={Constant.RESET_ICON}
+          source={Images.goTimer.RESET_ICON}
         />
       </TouchableHighlight>
       <TouchableHighlight
@@ -218,7 +243,7 @@ export default class GoTimer extends Component {
       >
         <Image
           style={styles.icon}
-          source={this.state.timerStart ? Constant.PAUSE_ICON : Constant.PLAY_ICON}
+          source={this.state.timerStart ? Images.goTimer.PAUSE_ICON : Images.goTimer.PLAY_ICON}
         />
       </TouchableHighlight>
     </View>
@@ -257,10 +282,9 @@ GoTimer.propTypes = {
 
 to do list:
   嗆聲綁於換對手時，才能使用，現次數不重複 => overMy 花兒謝了 烏龜你個蛋 科結語
-  resetButton觸發modalView
   README.md
+  support ios 各個手機、平板
   support Android
 bugs:
-  重設按鈕，於基本時限為零時，顯示尚有問題
 
 */

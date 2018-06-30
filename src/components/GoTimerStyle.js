@@ -1,6 +1,11 @@
 import { StyleSheet } from 'react-native';
 import Device from '../DeviceType';
-import * as Constant from '../Constant';
+
+export const elseStyle = {
+  RUNNER_BORDER_COLOR: '#e15f41',
+  STOPPER_BORDER_COLOR: '#d1ccc070',
+  TOUCH_AREA_UNDERLAY_COLOR: 'rgba(0, 0, 0, 0.05)',
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -18,7 +23,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0)',
     alignSelf: 'stretch',
     borderWidth: 10,
-    borderColor: Constant.STOPPER_BORDER_COLOR,
+    borderColor: elseStyle.STOPPER_BORDER_COLOR,
     borderRadius: 1,
   },
   touchInnerContainer: {

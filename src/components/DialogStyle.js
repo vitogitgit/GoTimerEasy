@@ -17,7 +17,7 @@ export const styles = StyleSheet.create({
     height: 200,
     borderRadius: 8,
     alignItems: 'center',
-    paddingTop: 60,
+    paddingTop: 48,
   },
   buttonsContainer: {
     position: 'absolute',

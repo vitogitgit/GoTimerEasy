@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import { View, StyleSheet, AsyncStorage } from 'react-native';
 import PropTypes from 'prop-types';
-import * as Constant from '../Constant';
+import Strings from '../constant/Strings';
+import Numbers from '../constant/Numbers';
 
 const styles = StyleSheet.create({
   container: {
@@ -23,12 +24,8 @@ export default class StartPage extends Component {
   }
 
   settingRulesData = () => {
-    const {
-      INITIAL_TIME,
-      COUNTDOWN_TIME,
-      NUMBER_OF_COUNTDOWN,
-      LOCAL_STORAGE_KEY_RULES,
-    } = Constant;
+    const { LOCAL_STORAGE_KEY_RULES } = Strings.else;
+    const { INITIAL_TIME, COUNTDOWN_TIME, NUMBER_OF_COUNTDOWN } = Numbers.defaultRules;
 
     AsyncStorage.getItem(LOCAL_STORAGE_KEY_RULES)
       .then((rulesData) => {

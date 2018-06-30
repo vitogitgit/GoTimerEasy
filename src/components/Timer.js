@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
 import PropTypes from 'prop-types';
-import * as Constant from '../Constant';
+import Sounds from '../constant/Sounds';
+import Images from '../constant/Images';
 import VideoPlayer from './VideoPlayer';
 
 const styles = StyleSheet.create({
@@ -22,28 +23,28 @@ const playVideoByCountdown = (prevState, component) => {
   let src;
   switch (seconds) {
     case 1:
-      src = Constant.SOUND_NUMBER_1;
+      src = Sounds.countdown.SOUND_NUMBER_1;
       break;
     case 2:
-      src = Constant.SOUND_NUMBER_2;
+      src = Sounds.countdown.SOUND_NUMBER_2;
       break;
     case 3:
-      src = Constant.SOUND_NUMBER_3;
+      src = Sounds.countdown.SOUND_NUMBER_3;
       break;
     case 4:
-      src = Constant.SOUND_NUMBER_4;
+      src = Sounds.countdown.SOUND_NUMBER_4;
       break;
     case 5:
-      src = Constant.SOUND_NUMBER_5;
+      src = Sounds.countdown.SOUND_NUMBER_5;
       break;
     case 6:
-      src = Constant.SOUND_NUMBER_6;
+      src = Sounds.countdown.SOUND_NUMBER_6;
       break;
     case 7:
-      src = Constant.SOUND_NUMBER_7;
+      src = Sounds.countdown.SOUND_NUMBER_7;
       break;
     case 8:
-      src = Constant.SOUND_NUMBER_8;
+      src = Sounds.countdown.SOUND_NUMBER_8;
       break;
     default:
       return;
@@ -176,7 +177,7 @@ export default class Timer extends Component {
       return (
         <Image
           style={styles.timeOverImage}
-          source={Constant.TIME_OVER_ICON}
+          source={Images.goTimer.TIME_OVER_ICON}
         />
       );
     }

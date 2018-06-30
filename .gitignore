@@ -6,6 +6,7 @@ yarn.lock
 
 # Xcode
 #
+ios/bundle/assets
 build/
 *.pbxuser
 !default.pbxuser
