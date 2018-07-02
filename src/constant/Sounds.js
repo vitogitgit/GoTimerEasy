@@ -30,12 +30,14 @@ export default {
     TAUNT_HINT_ZERO: require('../assets/sound/taunt/taunt_hint_zero.mp3'),
     TAUNT_HINT_STOP: require('../assets/sound/taunt/taunt_hint_stop.mp3'),
     random: [
-      require('../assets/sound/taunt/taunt_quick.mp3'),
-      require('../assets/sound/taunt/taunt_badHand.mp3'),
-      require('../assets/sound/taunt/taunt_blood.mp3'),
-      require('../assets/sound/taunt/taunt_moral.mp3'),
-      require('../assets/sound/taunt/taunt_work.mp3'),
-      require('../assets/sound/taunt/taunt_overMyDeadBody.mp3'),
+      require('../assets/sound/taunt/taunt_blood.mp3'), // 10, [我要讓你的屁屁血濺五步]
+      require('../assets/sound/taunt/taunt_quick.mp3'), // 9, [快點吧，我等到花兒都謝了]
+      require('../assets/sound/taunt/taunt_badHand.mp3'), // ?, [惡手、臭棋]
+      require('../assets/sound/taunt/taunt_moral.mp3'), // ?, [我是以德服人]
+      require('../assets/sound/taunt/taunt_overMyDeadBody.mp3'), // ?, [想吃這條龍]
+      require('../assets/sound/taunt/taunt_work.mp3'), // ?, [把工作當休閒]
+      // 奧義，火滋・焚骨，燒光你的屁屁毛
+      // 我會讓你殼裂龜死
     ],
   },
   click: {

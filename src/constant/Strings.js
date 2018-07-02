@@ -14,6 +14,7 @@ export default {
     PATTERN_MEDIUN_TEXT: '中等',
     PATTERN_SLOW_TEXT: '慢棋',
     SETTING_BUTTON_TEXT: '確定',
+    CHECKBOX_TITLE: '嘲諷功能',
   },
   else: {
     LOCAL_STORAGE_KEY_RULES: 'rules',

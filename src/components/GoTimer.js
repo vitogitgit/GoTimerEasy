@@ -13,7 +13,6 @@ import Dialog from './Dialog';
 import * as Controller from './GoTimerController';
 import Sounds from '../constant/Sounds';
 import Images from '../constant/Images';
-import Numbers from '../constant/Numbers';
 
 export default class GoTimer extends Component {
   static navigationOptions = {
@@ -101,11 +100,13 @@ export default class GoTimer extends Component {
       timerStart: false,
       timerPause: true,
     });
+    const { params } = this.props.navigation.state;
     this.props.navigation.navigate('Setting', {
       resetGoTimer: this.resetGoTimer,
-      initialTime: Controller.getInitialTime(this),
-      countdownTime: Controller.getCountdownTime(this),
-      numberOfCountdown: Controller.getNumberOfCountdown(this),
+      initialTime: params.initialTime,
+      countdownTime: params.countdownTime,
+      numberOfCountdown: params.numberOfCountdown,
+      numberOfTaunt: params.numberOfTaunt,
     });
   }
 
@@ -122,11 +123,11 @@ export default class GoTimer extends Component {
   }
 
   setInitialVar = () => {
-    const { NUMBER_OF_TAUNT } = Numbers.defaultRules;
+    const { numberOfTaunt } = this.props.navigation.state.params;
     this.var = {
       gameOver: false,
-      numberOfTauntsForBlack: NUMBER_OF_TAUNT,
-      numberOfTauntsForWhite: NUMBER_OF_TAUNT,
+      numberOfTauntsForBlack: numberOfTaunt,
+      numberOfTauntsForWhite: numberOfTaunt,
     };
   }
 
@@ -185,9 +186,9 @@ export default class GoTimer extends Component {
   resetGoTimer = () => {
     this.timerForBlack.current.resetTimer();
     this.timerForWhite.current.resetTimer();
-    this.setInitialVar();
     setTimeout(() => {
       const numberOfCountdown = Controller.getNumberOfCountdown(this);
+      this.setInitialVar();
       this.setState({
         timerStart: false,
         timerPause: false,
@@ -211,8 +212,8 @@ export default class GoTimer extends Component {
         timerPause={this.state.timerPause}
         onCountdown={() => {
           Controller.onCountdown(isBlack, this);
-          this.var.numberOfTauntsForBlack = -1;
-          this.var.numberOfTauntsForWhite = -1;
+          this.var.numberOfTauntsForBlack = this.var.numberOfTauntsForBlack === 0 ? 0 : -1;
+          this.var.numberOfTauntsForWhite = this.var.numberOfTauntsForWhite === 0 ? 0 : -1;
         }}
         onCountdownOver={() => this.onCountdownOver(isBlack)}
         onTimeOver={() => this.onTimeOver(isBlack)}
@@ -317,6 +318,8 @@ GoTimer.propTypes = {
 
 to do list:
   README.md
+  修改 constant 大寫英文到小寫
+  react-native-i18n 多語系，支援英文、中文，聲音 & 字符串
   support ios 各個手機、平板
   support Android
 bugs:

@@ -40,6 +40,8 @@ const styles = StyleSheet.create({
     fontSize: 30,
   },
   patternContainer: {
+    position: 'absolute',
+    bottom: 180,
     justifyContent: 'center',
     alignItems: 'center',
     width: 230,
@@ -55,6 +57,24 @@ const styles = StyleSheet.create({
     width: 120,
     height: 120,
   },
+  checkboxPosition: {
+    position: 'absolute',
+    bottom: 100,
+  },
+  checkboxContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexDirection: 'row',
+    padding: 8,
+  },
+  checkboxImage: {
+    width: 64,
+    height: 40,
+    marginRight: 16,
+  },
+  checkboxText: {
+    fontSize: 16,
+  },
 });
 
 export default styles;
@@ -64,4 +84,5 @@ export const elseStyle = {
   PATTERN_FAST_COLOR: '#eb4d4b',
   PATTERN_MEDIUN_COLOR: '#686de0',
   PATTERN_SLOW_COLOR: '#6ab04c',
+  CHECKBOX_UNDERLAY_COLOR: 'rgba(0,0,0,0.005)',
 };

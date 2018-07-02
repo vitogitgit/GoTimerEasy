@@ -5,6 +5,8 @@ import Strings from '../constant/Strings';
 import { setLocalStorage } from '../LocalStorage';
 import styles, { elseStyle } from './SettingStyle';
 import * as Controller from './SettingController';
+import Images from '../constant/Images';
+import Numbers from '../constant/Numbers';
 
 export default class Setting extends Component {
   static navigationOptions = {
@@ -18,7 +20,16 @@ export default class Setting extends Component {
       initialTime: params.initialTime,
       countdownTime: params.countdownTime,
       numberOfCountdown: params.numberOfCountdown,
+      numberOfTaunt: params.numberOfTaunt,
     };
+  }
+
+  onPressCheckbox = (numberOfTaunt) => {
+    if (numberOfTaunt === 0) {
+      this.setState({ numberOfTaunt: Numbers.defaultRules.NUMBER_OF_TAUNT });
+    } else {
+      this.setState({ numberOfTaunt: 0 });
+    }
   }
 
   updateInitialTime = (time) => {
@@ -86,8 +97,11 @@ export default class Setting extends Component {
   )
 
   renderSettingBlock = () => {
-    const pickerData = Controller.getPickerData(this);
-    const { initialTime, countdownTime, numberOfCountdown } = pickerData;
+    const {
+      initialTime,
+      countdownTime,
+      numberOfCountdown,
+    } = Controller.getPickerData(this);
     return (
       <View style={{ flexDirection: 'row' }}>
         {this.renderPicker(...initialTime)}
@@ -112,12 +126,35 @@ export default class Setting extends Component {
     );
   }
 
+  renderCheckbox = () => {
+    const { numberOfTaunt } = this.state;
+    const { CHECKBOX_TRUE, CHECKBOX_FALSE } = Images.settingPage;
+    return (
+      <TouchableHighlight
+        style={styles.checkboxPosition}
+        onPress={() => this.onPressCheckbox(numberOfTaunt)}
+        underlayColor={elseStyle.CHECKBOX_UNDERLAY_COLOR}
+      >
+        <View style={styles.checkboxContainer}>
+          <Image
+            style={styles.checkboxImage}
+            source={numberOfTaunt === 0 ? CHECKBOX_FALSE : CHECKBOX_TRUE}
+          />
+          <Text style={styles.checkboxText}>
+            {Strings.settingPage.CHECKBOX_TITLE}
+          </Text>
+        </View>
+      </TouchableHighlight>
+    );
+  }
+
   renderSettingButton = () => {
     const { LOCAL_STORAGE_KEY_RULES } = Strings.else;
     const settingData = {
       initialTime: this.state.initialTime,
       countdownTime: this.state.countdownTime,
       numberOfCountdown: this.state.numberOfCountdown,
+      numberOfTaunt: this.state.numberOfTaunt,
     };
     return (
       <TouchableHighlight
@@ -141,6 +178,7 @@ export default class Setting extends Component {
         {this.renderRules()}
         {this.renderSettingBlock()}
         {this.renderPatternImage()}
+        {this.renderCheckbox()}
         {this.renderSettingButton()}
       </View>
     );
