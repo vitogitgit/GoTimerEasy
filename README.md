@@ -5,9 +5,9 @@ Author: Vito
 ****
 
 ## Outline:
-* [Build](#Build)
-* [Features](#Features)
-* [ToDoList](#ToDoList)
+* [Build](#build)
+* [Features](#features)
+* [ToDoList](#to-do-list)
 ***
 ## Build:
 ### <download project>
@@ -37,10 +37,10 @@ Xcode run project
 ## Features:
 
 ### <Go Timer Screen>
-![image](https://github.com/vitogitgit/GoTimerEasy/blob/master/go-timer-screen.PNG)
+![image](https://raw.githubusercontent.com/vitogitgit/GoTimerEasy/0bec667525c5cf0a281ca05f2c040ca0b5460a2d/go-timer-screen.png)
 ***
 ### <Setting Screen>
-![image](https://github.com/vitogitgit/GoTimerEasy/blob/master/setting-screen.PNG)
+![image](https://raw.githubusercontent.com/vitogitgit/GoTimerEasy/0bec667525c5cf0a281ca05f2c040ca0b5460a2d/setting-screen.png)
 ***
 
 * Timer Component
@@ -82,7 +82,7 @@ Xcode run project
     * Use `default parameters` if there is no local storage.
     * Complete the settings to `navigate to Go Timer Screen`.
 ***
-## ToDoList:
+## To Do List:
 * task:
     * 整理 coding style，修改 constant 大寫英文到小寫
     * react-native-i18n 多語系，支援英文、中文，聲音 & 字符串
