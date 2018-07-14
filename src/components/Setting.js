@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import Strings from '../constant/Strings';
 import { setLocalStorage } from '../LocalStorage';
 import styles, { elseStyle } from './SettingStyle';
-import * as Controller from './SettingController';
+import * as Methods from './SettingMethods';
 import Images from '../constant/Images';
 import Numbers from '../constant/Numbers';
 
@@ -101,7 +101,7 @@ export default class Setting extends Component {
       initialTime,
       countdownTime,
       numberOfCountdown,
-    } = Controller.getPickerData(this);
+    } = Methods.getPickerData(this);
     return (
       <View style={{ flexDirection: 'row' }}>
         {this.renderPicker(...initialTime)}
@@ -112,7 +112,7 @@ export default class Setting extends Component {
   }
 
   renderPatternImage = () => {
-    const pattern = Controller.setPatternType(this.state);
+    const pattern = Methods.setPatternType(this.state);
     return (
       <View style={styles.patternContainer}>
         <Text style={[styles.patternText, pattern.textColor]}>

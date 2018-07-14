@@ -3,7 +3,7 @@ import Strings from '../constant/Strings';
 import Numbers from '../constant/Numbers';
 import Images from '../constant/Images';
 
-export const scoreFromInitialTime = (initialTime) => {
+const scoreFromInitialTime = (initialTime) => {
   if (initialTime < 1200) {
     return 11;
   } else if (initialTime <= 2100) {
@@ -14,17 +14,17 @@ export const scoreFromInitialTime = (initialTime) => {
   return -10;
 };
 
-export const scoreFromCountdownTime = (countdownTime, score) => {
+const scoreFromCountdownTime = (countdownTime, score) => {
   const movingValue = ((countdownTime / 5) - 6) * -2;
   return score + movingValue;
 };
 
-export const scoreFromNumberOfCountdown = (numberOfCountdown, score) => {
+const scoreFromNumberOfCountdown = (numberOfCountdown, score) => {
   const movingValue = (numberOfCountdown - 3) * -2;
   return score + movingValue;
 };
 
-export const getPatternParm = (score) => {
+const getPatternParm = (score) => {
   const {
     PATTERN_SLOW_COLOR,
     PATTERN_MEDIUN_COLOR,

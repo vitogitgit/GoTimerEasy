@@ -10,13 +10,14 @@ import styles, { elseStyle } from './GoTimerStyle';
 import Timer from './Timer';
 import VideoPlayer from './VideoPlayer';
 import Dialog from './Dialog';
-import * as Controller from './GoTimerController';
+import * as Methods from './GoTimerMethods';
 import Sounds from '../constant/Sounds';
 import Images from '../constant/Images';
 
 export default class GoTimer extends Component {
   static navigationOptions = {
     header: null,
+    gesturesEnabled: false,
   };
 
   constructor(props) {
@@ -39,8 +40,8 @@ export default class GoTimer extends Component {
   }
 
   componentDidUpdate() {
-    Controller.playVideoFromFisrtStart(this);
-    Controller.playVideoFromLastCountdown(this);
+    Methods.playVideoFromFisrtStart(this);
+    Methods.playVideoFromLastCountdown(this);
   }
 
   onTimeOver = (isBlack) => {
@@ -49,6 +50,8 @@ export default class GoTimer extends Component {
     const src = isBlack ? srcBlack : srcWhite;
     this.video.current.play(src);
     this.var.gameOver = true;
+    this.var.numberOfTauntsForBlack = 0;
+    this.var.numberOfTauntsForWhite = 0;
   }
 
   onCountdownOver = (isBlack) => {
@@ -73,7 +76,7 @@ export default class GoTimer extends Component {
 
   onPressTouchArea = (isBlack) => {
     const { timerStart, trunBlack } = this.state;
-    if (Controller.playStatusTrunOpponent(isBlack, this)) {
+    if (Methods.playStatusTrunOpponent(isBlack, this)) {
       return this.triggeringTauntEvent(isBlack);
     } else if (this.var.gameOver) {
       return this.clickPlayer.current.play(Sounds.click.MINECRAFT_PIG_MP3);
@@ -187,7 +190,7 @@ export default class GoTimer extends Component {
     this.timerForBlack.current.resetTimer();
     this.timerForWhite.current.resetTimer();
     setTimeout(() => {
-      const numberOfCountdown = Controller.getNumberOfCountdown(this);
+      const numberOfCountdown = Methods.getNumberOfCountdown(this);
       this.setInitialVar();
       this.setState({
         timerStart: false,
@@ -205,13 +208,13 @@ export default class GoTimer extends Component {
     <View style={[styles.touchInnerContainer, { transform: this.transformFlip }]}>
       <Timer
         ref={isBlack ? this.timerForBlack : this.timerForWhite}
-        initialTime={Controller.getInitialTime(this)}
-        countdownTime={Controller.getCountdownTime(this)}
-        numberOfCountdown={Controller.getNumberOfCountdown(this)}
-        timerStart={Controller.playStatusTrunMe(isBlack, this)}
+        initialTime={Methods.getInitialTime(this)}
+        countdownTime={Methods.getCountdownTime(this)}
+        numberOfCountdown={Methods.getNumberOfCountdown(this)}
+        timerStart={Methods.playStatusTrunMe(isBlack, this)}
         timerPause={this.state.timerPause}
         onCountdown={() => {
-          Controller.onCountdown(isBlack, this);
+          Methods.onCountdown(isBlack, this);
           this.var.numberOfTauntsForBlack = this.var.numberOfTauntsForBlack === 0 ? 0 : -1;
           this.var.numberOfTauntsForWhite = this.var.numberOfTauntsForWhite === 0 ? 0 : -1;
         }}
@@ -223,7 +226,7 @@ export default class GoTimer extends Component {
       </View>
       <View style={styles.countRulesContainer}>
         <Text style={styles.rulesText}>
-          {`${Controller.getCountdownTime(this)}s[${Controller.currentNumberOfCountdown(isBlack, this)}]`}
+          {`${Methods.getCountdownTime(this)}s[${Methods.currentNumberOfCountdown(isBlack, this)}]`}
         </Text>
       </View>
       <View style={[
@@ -238,10 +241,10 @@ export default class GoTimer extends Component {
     <TouchableHighlight
       style={[
         styles.touchAreaContainer,
-        { borderColor: Controller.runnerColor(isBlack, this) },
+        { borderColor: Methods.runnerColor(isBlack, this) },
       ]}
       onPress={() => this.onPressTouchArea(isBlack)}
-      underlayColor={Controller.playStatusTrunOpponent(isBlack, this) ?
+      underlayColor={Methods.playStatusTrunOpponent(isBlack, this) ?
         null : elseStyle.TOUCH_AREA_UNDERLAY_COLOR}
     >
       {this.renderInnerObject(isBlack)}
@@ -313,15 +316,3 @@ export default class GoTimer extends Component {
 GoTimer.propTypes = {
   navigation: PropTypes.objectOf(PropTypes.any).isRequired,
 };
-
-/*
-
-to do list:
-  README.md
-  修改 constant 大寫英文到小寫
-  react-native-i18n 多語系，支援英文、中文，聲音 & 字符串
-  support ios 各個手機、平板
-  support Android
-bugs:
-
-*/
