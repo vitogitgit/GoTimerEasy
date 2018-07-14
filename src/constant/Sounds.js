@@ -36,8 +36,19 @@ export default {
       require('../assets/sound/taunt/taunt_moral.mp3'), // ?, [我是以德服人]
       require('../assets/sound/taunt/taunt_overMyDeadBody.mp3'), // ?, [想吃這條龍]
       require('../assets/sound/taunt/taunt_work.mp3'), // ?, [把工作當休閒]
+      require('../assets/sound/taunt/hearthstone/hs_IAmPower.mp3'),
+      require('../assets/sound/taunt/hearthstone/hs_beBrave.mp3'),
+      require('../assets/sound/taunt/hearthstone/hs_letMeLook.mp3'),
+      require('../assets/sound/taunt/hearthstone/hs_allIsFire.mp3'),
+      require('../assets/sound/taunt/hearthstone/hs_deadBugs.mp3'),
+      require('../assets/sound/taunt/hearthstone/hs_myKnifeNeedBlood.mp3'),
+      require('../assets/sound/taunt/hearthstone/hs_areYouNeed.mp3'),
+      require('../assets/sound/taunt/hearthstone/hs_letFireClean.mp3'),
+      require('../assets/sound/taunt/hearthstone/hs_veryPainful.mp3'),
       // 奧義，火滋・焚骨，燒光你的屁屁毛
       // 我會讓你殼裂龜死
+      // 聖光啊，那個邪惡看起來值得一戰
+      // 我是魔法的精華
     ],
   },
   click: {
