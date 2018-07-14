@@ -7,6 +7,7 @@ yarn.lock
 # Xcode
 #
 ios/bundle/assets
+ios/bundle/index.jsbundle.meta
 build/
 *.pbxuser
 !default.pbxuser
