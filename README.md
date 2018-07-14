@@ -10,29 +10,35 @@ Author: Vito
 * [ToDoList](#to-do-list)
 ***
 ## Build:
-### <download project>
+
+<download project>
 ```
 git clone https://github.com/vitogitgit/GoTimerEasy.git
 ```
-### <node modules install>
+
+<node modules install>
 ```
 npm install
 ```
-### <bundle js files>
+
+<bundle js files>
 ```
 npm run bundle-ios
 ```
-### <open target .xcodeproj>
+
+<open target .xcodeproj>
 ```
 cd ios
 ```
 ```
 open GoTimerEasy.xcodeproj
 ```
-### <build project>
+
+<build project>
 ```
 Xcode run project
 ```
+
 ***
 ## Features:
 
