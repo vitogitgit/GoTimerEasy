@@ -4,74 +4,20 @@ import {
   View,
   Text,
   Image,
-  StyleSheet,
   TouchableHighlight,
 } from 'react-native';
-
+import styles, { elseStyle } from './GoTimerStyle';
 import Timer from './Timer';
 import VideoPlayer from './VideoPlayer';
-import Device from '../DeviceType';
-import * as Constant from '../Constant';
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: Device.isIphoneX() ? 30 : 20,
-    marginBottom: Device.isIphoneX() ? 15 : 0,
-  },
-  touchAreaContainer: {
-    flex: 1,
-    margin: 8,
-    marginLeft: 12,
-    marginRight: 12,
-    backgroundColor: 'rgba(0, 0, 0, 0)',
-    alignSelf: 'stretch',
-    borderWidth: 10,
-    borderColor: Constant.STOPPER_BORDER_COLOR,
-    borderRadius: 1,
-  },
-  touchInnerContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  settingAreaContainer: {
-    flex: 0.2,
-    flexDirection: 'row',
-    alignSelf: 'stretch',
-    justifyContent: 'space-evenly',
-    alignItems: 'center',
-  },
-  stepContainer: {
-    position: 'absolute',
-    top: 20,
-  },
-  countRulesContainer: {
-    position: 'absolute',
-    top: 20,
-    left: 15,
-  },
-  markContainer: {
-    position: 'absolute',
-    right: 10,
-    bottom: 10,
-    width: 30,
-    height: 30,
-    borderWidth: 1,
-    borderColor: 'black',
-    borderRadius: 15,
-  },
-  icon: {
-    width: 40,
-    height: 40,
-  },
-});
+import Dialog from './Dialog';
+import * as Methods from './GoTimerMethods';
+import Sounds from '../constant/Sounds';
+import Images from '../constant/Images';
 
 export default class GoTimer extends Component {
   static navigationOptions = {
     header: null,
+    gesturesEnabled: false,
   };
 
   constructor(props) {
@@ -81,10 +27,12 @@ export default class GoTimer extends Component {
       timerStart: false,
       timerPause: false,
       trunBlack: true,
+      showDialog: false,
       goSteps: 0,
       numberOfCountdownForBlack: numberOfCountdown,
       numberOfCountdownForWhite: numberOfCountdown,
     };
+    this.setInitialVar();
     this.timerForBlack = React.createRef();
     this.timerForWhite = React.createRef();
     this.video = React.createRef();
@@ -92,24 +40,18 @@ export default class GoTimer extends Component {
   }
 
   componentDidUpdate() {
-    this.playVideoFromFisrtStart();
-    this.playVideoFromLastCountdown();
-  }
-
-  onCountdown = (isBlack) => {
-    const initialTime = this.getInitialTime();
-    if (initialTime === 0) { return; }
-    const srcBlack = Constant.REF_BLACK_COUNTDOWN_START;
-    const srcWhite = Constant.REF_WHITE_COUNTDOWN_START;
-    const src = isBlack ? srcBlack : srcWhite;
-    this.video.current.play(src);
+    Methods.playVideoFromFisrtStart(this);
+    Methods.playVideoFromLastCountdown(this);
   }
 
   onTimeOver = (isBlack) => {
-    const srcBlack = Constant.REF_BLACK_LOST;
-    const srcWhite = Constant.REF_WHITE_LOST;
+    const srcBlack = Sounds.referee.REF_BLACK_LOST;
+    const srcWhite = Sounds.referee.REF_WHITE_LOST;
     const src = isBlack ? srcBlack : srcWhite;
     this.video.current.play(src);
+    this.var.gameOver = true;
+    this.var.numberOfTauntsForBlack = 0;
+    this.var.numberOfTauntsForWhite = 0;
   }
 
   onCountdownOver = (isBlack) => {
@@ -118,7 +60,7 @@ export default class GoTimer extends Component {
       REF_BLACK_COUNTDOWN_LAST,
       REF_WHITE_COUNTDOWN_DEC,
       REF_WHITE_COUNTDOWN_LAST,
-    } = Constant;
+    } = Sounds.referee;
     let { numberOfCountdownForBlack, numberOfCountdownForWhite } = this.state;
     let src;
 
@@ -132,71 +74,129 @@ export default class GoTimer extends Component {
     this.video.current.play(src);
   }
 
-  getInitialTime = () => {
+  onPressTouchArea = (isBlack) => {
+    const { timerStart, trunBlack } = this.state;
+    if (Methods.playStatusTrunOpponent(isBlack, this)) {
+      return this.triggeringTauntEvent(isBlack);
+    } else if (this.var.gameOver) {
+      return this.clickPlayer.current.play(Sounds.click.MINECRAFT_PIG_MP3);
+    }
+
+    if (!timerStart) {
+      this.clickPlayer.current.play(Sounds.click.CLICK_TIMER_MP3);
+      this.setState({
+        timerStart: true,
+        timerPause: false,
+      });
+    } else {
+      this.clickPlayer.current.play(Sounds.click.CLICK_TIMER_MP3);
+      this.setState({
+        trunBlack: !trunBlack,
+        goSteps: this.state.goSteps += 1,
+      });
+    }
+    return null;
+  }
+
+  onPressSettingButton = () => {
+    this.setState({
+      timerStart: false,
+      timerPause: true,
+    });
     const { params } = this.props.navigation.state;
-    if (typeof params === 'undefined') {
-      return Constant.INITIAL_TIME;
-    }
-    return params.initialTime;
+    this.props.navigation.navigate('Setting', {
+      resetGoTimer: this.resetGoTimer,
+      initialTime: params.initialTime,
+      countdownTime: params.countdownTime,
+      numberOfCountdown: params.numberOfCountdown,
+      numberOfTaunt: params.numberOfTaunt,
+    });
   }
 
-  getCountdownTime = () => {
-    const { params } = this.props.navigation.state;
-    if (typeof params === 'undefined') {
-      return Constant.COUNTDOWN_TIME;
+  onPressPlayButton = () => {
+    if (this.var.gameOver) {
+      this.clickPlayer.current.play(Sounds.click.MINECRAFT_PIG_MP3);
+      return;
     }
-    return params.countdownTime;
+    this.clickPlayer.current.play(Sounds.click.CLICK_TIMER_MP3);
+    this.setState({
+      timerStart: !this.state.timerStart,
+      timerPause: this.state.timerStart,
+    });
   }
 
-  getNumberOfCountdown = () => {
-    const { params } = this.props.navigation.state;
-    if (typeof params === 'undefined') {
-      return Constant.NUMBER_OF_COUNTDOWN;
-    }
-    return params.numberOfCountdown;
+  setInitialVar = () => {
+    const { numberOfTaunt } = this.props.navigation.state.params;
+    this.var = {
+      gameOver: false,
+      numberOfTauntsForBlack: numberOfTaunt,
+      numberOfTauntsForWhite: numberOfTaunt,
+    };
   }
 
-  playVideoFromFisrtStart = () => {
-    const { REF_BLACK_START, REF_WHITE_START } = Constant;
-    const { goSteps, timerStart } = this.state;
-    if (!timerStart) { return; }
-    if (goSteps === 0) {
-      this.video.current.play(REF_BLACK_START);
-    } else if (goSteps === 1) {
-      this.video.current.play(REF_WHITE_START);
-    }
-  }
-
-  playVideoFromLastCountdown = () => {
-    const { REF_BLACK_COUNTDOWN_LAST, REF_WHITE_COUNTDOWN_LAST } = Constant;
+  setTauntSource = (numberOfTaunts) => {
     const {
-      trunBlack,
-      timerStart,
-      numberOfCountdownForBlack,
-      numberOfCountdownForWhite,
-    } = this.state;
-    if (!timerStart) { return; }
-    if (trunBlack && numberOfCountdownForBlack === 1) {
-      this.video.current.play(REF_BLACK_COUNTDOWN_LAST);
-    } else if (numberOfCountdownForWhite === 1) {
-      this.video.current.play(REF_WHITE_COUNTDOWN_LAST);
+      TAUNT_HINT_THREE,
+      TAUNT_HINT_ZERO,
+      TAUNT_HINT_STOP,
+      random,
+    } = Sounds.taunt;
+    const randomBetweenArray = Math.floor(Math.random() * random.length);
+    let src = random[randomBetweenArray];
+
+    switch (numberOfTaunts) {
+      case -1:
+        this.var.numberOfTauntsForBlack = 0;
+        this.var.numberOfTauntsForWhite = 0;
+        src = TAUNT_HINT_STOP;
+        break;
+      case 1:
+        src = TAUNT_HINT_ZERO;
+        break;
+      case 4:
+        src = TAUNT_HINT_THREE;
+        break;
+      default:
+        break;
     }
+    return src;
   }
 
-  currentNumberOfCountdown = (isBlack) => {
-    const { numberOfCountdownForBlack, numberOfCountdownForWhite } = this.state;
-    return isBlack ? numberOfCountdownForBlack : numberOfCountdownForWhite;
+  openDialog = () => this.setState({
+    showDialog: true,
+    timerStart: false,
+    timerPause: true,
+  });
+
+  triggeringTauntEvent = (isBlack) => {
+    const { numberOfTauntsForBlack, numberOfTauntsForWhite } = this.var;
+    let src;
+    if (isBlack) {
+      if (numberOfTauntsForBlack === 0) { return null; }
+      this.var.numberOfTauntsForBlack -= 1;
+      src = this.setTauntSource(numberOfTauntsForBlack);
+    } else {
+      if (numberOfTauntsForWhite === 0) { return null; }
+      this.var.numberOfTauntsForWhite -= 1;
+      src = this.setTauntSource(numberOfTauntsForWhite);
+    }
+    this.video.current.play(src);
+    return null;
   }
+
+  closeDialog = () => this.setState({ showDialog: false });
 
   resetGoTimer = () => {
     this.timerForBlack.current.resetTimer();
     this.timerForWhite.current.resetTimer();
     setTimeout(() => {
-      const numberOfCountdown = this.getNumberOfCountdown();
+      const numberOfCountdown = Methods.getNumberOfCountdown(this);
+      this.setInitialVar();
       this.setState({
         timerStart: false,
         timerPause: false,
         trunBlack: true,
+        showDialog: false,
         goSteps: 0,
         numberOfCountdownForBlack: numberOfCountdown,
         numberOfCountdownForWhite: numberOfCountdown,
@@ -204,32 +204,20 @@ export default class GoTimer extends Component {
     }, 3);
   }
 
-  runnerColor = (isBlack) => {
-    const { timerStart, trunBlack } = this.state;
-    if (timerStart && isBlack === trunBlack) {
-      return Constant.RUNNER_BORDER_COLOR;
-    }
-    return Constant.STOPPER_BORDER_COLOR;
-  }
-
-  playStatusTrunMyself = isBlack => (
-    this.state.timerStart && isBlack === this.state.trunBlack
-  )
-
-  playStatusTrunMyselfNot = isBlack => (
-    this.state.timerStart && isBlack !== this.state.trunBlack
-  )
-
   renderInnerObject = isBlack => (
     <View style={[styles.touchInnerContainer, { transform: this.transformFlip }]}>
       <Timer
         ref={isBlack ? this.timerForBlack : this.timerForWhite}
-        initialTime={this.getInitialTime()}
-        countdownTime={this.getCountdownTime()}
-        numberOfCountdown={this.getNumberOfCountdown()}
-        timerStart={this.playStatusTrunMyself(isBlack)}
+        initialTime={Methods.getInitialTime(this)}
+        countdownTime={Methods.getCountdownTime(this)}
+        numberOfCountdown={Methods.getNumberOfCountdown(this)}
+        timerStart={Methods.playStatusTrunMe(isBlack, this)}
         timerPause={this.state.timerPause}
-        onCountdown={() => this.onCountdown(isBlack)}
+        onCountdown={() => {
+          Methods.onCountdown(isBlack, this);
+          this.var.numberOfTauntsForBlack = this.var.numberOfTauntsForBlack === 0 ? 0 : -1;
+          this.var.numberOfTauntsForWhite = this.var.numberOfTauntsForWhite === 0 ? 0 : -1;
+        }}
         onCountdownOver={() => this.onCountdownOver(isBlack)}
         onTimeOver={() => this.onTimeOver(isBlack)}
       />
@@ -237,7 +225,9 @@ export default class GoTimer extends Component {
         <Text>{this.state.goSteps}</Text>
       </View>
       <View style={styles.countRulesContainer}>
-        <Text>{this.getCountdownTime()}s[{this.currentNumberOfCountdown(isBlack)}]</Text>
+        <Text style={styles.rulesText}>
+          {`${Methods.getCountdownTime(this)}s[${Methods.currentNumberOfCountdown(isBlack, this)}]`}
+        </Text>
       </View>
       <View style={[
           styles.markContainer,
@@ -251,42 +241,18 @@ export default class GoTimer extends Component {
     <TouchableHighlight
       style={[
         styles.touchAreaContainer,
-        { borderColor: this.runnerColor(isBlack) },
+        { borderColor: Methods.runnerColor(isBlack, this) },
       ]}
-      onPress={() => {
-        const { timerStart, trunBlack } = this.state;
-        if (this.playStatusTrunMyselfNot(isBlack)) {
-          return null;
-        }
-        if (!timerStart) {
-          this.clickPlayer.current.play(Constant.CLICK_TIMER_MP3);
-          this.setState({
-            timerStart: true,
-            timerPause: false,
-          });
-        } else {
-          this.clickPlayer.current.play(Constant.CLICK_TIMER_MP3);
-          this.setState({
-            trunBlack: !trunBlack,
-            goSteps: this.state.goSteps += 1,
-          });
-        }
-        return null;
-      }}
-      underlayColor={this.playStatusTrunMyselfNot(isBlack) ?
-        null : Constant.TOUCH_AREA_UNDERLAY_COLOR}
+      onPress={() => this.onPressTouchArea(isBlack)}
+      underlayColor={Methods.playStatusTrunOpponent(isBlack, this) ?
+        null : elseStyle.TOUCH_AREA_UNDERLAY_COLOR}
     >
       {this.renderInnerObject(isBlack)}
     </TouchableHighlight>
   )
 
   renderTouchArea = (isBlack) => {
-    this.transformFlip = [];
-
-    if (isBlack) {
-      this.transformFlip = [{ rotate: '180deg' }];
-    }
-
+    this.transformFlip = isBlack ? [{ rotate: '180deg' }] : [];
     return (this.renderTouchable(isBlack));
   }
 
@@ -294,50 +260,44 @@ export default class GoTimer extends Component {
     <View style={styles.settingAreaContainer}>
       <TouchableHighlight
         underlayColor={null}
-        onPress={() => {
-          this.setState({
-            timerStart: false,
-            timerPause: true,
-          });
-          this.props.navigation.navigate('Setting', {
-            resetGoTimer: this.resetGoTimer,
-            initialTime: this.getInitialTime(),
-            countdownTime: this.getCountdownTime(),
-            numberOfCountdown: this.getNumberOfCountdown(),
-          });
-        }}
+        onPress={() => this.onPressSettingButton()}
       >
         <Image
           style={styles.icon}
-          source={Constant.SETTING_ICON}
+          source={Images.goTimer.SETTING_ICON}
         />
       </TouchableHighlight>
       <TouchableHighlight
         underlayColor={null}
-        onPress={() => this.resetGoTimer()}
+        onPress={() => this.openDialog()}
       >
         <Image
           style={styles.icon}
-          source={Constant.RESET_ICON}
+          source={Images.goTimer.RESET_ICON}
         />
       </TouchableHighlight>
       <TouchableHighlight
         underlayColor={null}
-        onPress={() => {
-          this.clickPlayer.current.play(Constant.CLICK_TIMER_MP3);
-          this.setState({
-            timerStart: !this.state.timerStart,
-            timerPause: this.state.timerStart,
-          });
-        }}
+        onPress={() => this.onPressPlayButton()}
       >
         <Image
           style={styles.icon}
-          source={this.state.timerStart ? Constant.PAUSE_ICON : Constant.PLAY_ICON}
+          source={this.state.timerStart ? Images.goTimer.PAUSE_ICON : Images.goTimer.PLAY_ICON}
         />
       </TouchableHighlight>
     </View>
   )
+
+  renderDialog = () => {
+    const { showDialog } = this.state;
+    if (!showDialog) { return null; }
+    return (
+      <Dialog
+        closeDialog={this.closeDialog}
+        resetGoTimer={this.resetGoTimer}
+      />
+    );
+  }
 
   render() {
     return (
@@ -345,6 +305,7 @@ export default class GoTimer extends Component {
         {this.renderTouchArea(true)}
         {this.renderSettingArea()}
         {this.renderTouchArea(false)}
+        {this.renderDialog()}
         <VideoPlayer ref={this.video} />
         <VideoPlayer ref={this.clickPlayer} />
       </View>
@@ -355,15 +316,3 @@ export default class GoTimer extends Component {
 GoTimer.propTypes = {
   navigation: PropTypes.objectOf(PropTypes.any).isRequired,
 };
-
-/*
-
-to do list:
-  iOS APP icon
-  resetButton觸發modalView
-  README.md
-  嗆聲綁於換對手時，才能使用，現次數不重複 => overMy 花兒謝了 烏龜你個蛋 科結語
-  support Android
-bugs:
-
-*/
